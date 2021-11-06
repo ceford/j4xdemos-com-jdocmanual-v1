@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+	<name>com_jdocmanual</name>
+	<author>Clifford E Ford</author>
+	<creationDate>August 2021</creationDate>
+	<copyright>(C) 2021 Clifford E Ford. All rights reserved.
+	</copyright>
+	<license>GNU General Public License version 3</license>
+	<authorEmail></authorEmail>
+	<authorUrl></authorUrl>
+	<version>0.2.0</version>
+	<description>COM_JDOCMANUAL_XML_DESCRIPTION</description>
+	<namespace path="src">J4xdemos\Component\Jdocmanual</namespace>
+
+	<media destination="com_jdocmanual" folder="media">
+		<file>joomla.asset.json</file>
+		<folder>css</folder>
+		<folder>js</folder>
+	</media>
+
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.sql</file>
+		</sql>
+	</uninstall>
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
+	</update>
+
+	<scriptfile>script.php</scriptfile>
+
+	<administration>
+		<files folder="admin">
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+			<folder>help</folder>
+			<folder>language</folder>
+			<folder>services</folder>
+			<folder>sql</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+		</files>
+		<menu 
+			link="option=com_jdocmanual&amp;view=jdocmanual"
+			img="class:default" alt="Jdocmanual"
+		>
+			com_jdocmanual
+		</menu>
+	</administration>
+	<dashboards>
+		<dashboard title="COM_JDOCMANUAL_DASHBOARD_TITLE" icon="icon-file-alt">jdocmanual</dashboard>
+	</dashboards>
+</extension>

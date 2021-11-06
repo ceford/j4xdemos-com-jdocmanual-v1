@@ -1,0 +1,99 @@
+@charset "UTF-8";
+
+#jdocmanual-wrapper {
+	height: 70vh;
+	overflow-y: auto;
+	min-height: 70vh;
+	max-width: unset;
+	z-index: 900 ! important;
+}
+
+#toggle-joomla-menu {
+	color: #fff;
+	background-color: var(--template-bg-dark-60);
+	cursor: pointer;
+}
+
+#jd-collapse {
+	color: #fff;
+}
+
+#menu1001.main-nav {
+	width: inherit;
+}
+
+#menu1001 .item a {
+	min-height: 30px;
+}
+
+#menu1001 .item-level-2 > a {
+	padding-inline-start: 1rem;
+}
+
+#menu1001 .item-level-3 > a {
+	padding-inline-start: 2rem;
+}
+
+#jdocmanual-main {
+	height: 70vh;
+	overflow-y: auto;
+	min-height: 70vh;
+}
+
+#document-panel {
+	background-color: #fff;
+}
+
+#document-panel h1 {
+	font-weight: 700;
+	border-bottom: 1px solid navy;
+	padding-top: 1rem;
+}
+
+#document-panel img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+#document-title {
+	margin-bottom: 0;
+	padding-top: 0.5rem;
+}
+
+.document-title {
+	background-color: #fff;
+	border-bottom: 1px solid navy;
+	position: sticky;
+	top: 0;
+}
+
+#toc-panel {
+	background-color: #fff;
+	border-left: 1px solid navy;
+	box-sizing: border-box;
+	font-size: 14px;
+	line-height: 1.5;
+	height: 70vh;
+	position: sticky;
+	top: 0;
+	right: 0;
+	z-index: 2;
+	overflow-y: auto;
+	padding-left: 1rem;
+}
+
+.toc-link {
+	margin: 0 0 0.25rem 0;
+	cursor: pointer;
+	list-style-type: none;
+}
+
+.toc-link:hover {
+	text-decoration: underline;
+}
+
+.toc-link-h3 {
+	padding-left: 1rem;
+}
+
