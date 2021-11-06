@@ -54,9 +54,6 @@
 			com_jdocmanual
 		</menu>
 	</administration>
-	<languages>
-		<language tag="en-GB">language/en-GB/com_jdocmanual.sys.ini</language>
-	</languages>
 	<dashboards>
 		<dashboard title="COM_JDOCMANUAL_DASHBOARD_TITLE" icon="icon-file-alt">jdocmanual</dashboard>
 	</dashboards>
