@@ -36,7 +36,15 @@ class com_jdocmanualInstallerScript
 	 */
 	protected function setParams()
 	{
-		$params = '{"manual1_name":"Joomla 3","manual1_url":"https:\/\/docs.joomla.org\/J3.x:Doc_Pages","manual2_name":"Joomla 4","manual2_url":"https:\/\/docs.joomla.org\/J4.x:Doc_Pages","manual3_name":"","manual3_url":"","default_manual":"1","languages":"en"}';
+		$params = '{';
+		$params .= '"manual1_name":"Joomla 4",';
+		$params .= '"manual1_url":"https:\/\/docs.joomla.org\/J4.x:Doc_Pages",';
+		$params .= '"manual2_name":"Joomla 4 Help Screens",';
+		$params .= '"manual2_url":"https://docs.joomla.org/J4.x:Help_pages",';
+		$params .= '"manual3_name":"Joomla 3",';
+		$params .= '"manual3_url":"https:\/\/docs.joomla.org\/J3.x:Doc_Pages",';
+		$params .= '"default_manual":"1","languages":"en"';
+		$params .= '}';
 
 		$db = Factory::getDbo();
 		$query = $db->getQuery(true)

@@ -50,6 +50,12 @@ class ContentController extends BaseController
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 	}
 
+	public function selectmanual3()
+	{
+		$this->reset(3);
+		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
+	}
+
 	protected function reset($id)
 	{
 		// unset the cookies
