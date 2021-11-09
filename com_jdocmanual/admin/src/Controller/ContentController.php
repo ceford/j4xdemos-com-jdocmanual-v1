@@ -175,6 +175,15 @@ class ContentController extends BaseController
 		// remove nodes not relevant in the manual
 		$xpath = new \DOMXPath($newdom);
 
+		// not all of these nodes are in all documents
+		foreach($xpath->query('//div[contains(attribute::class, "mw-pt-translate-header")]') as $e )
+		{
+			$e->parentNode->removeChild($e);
+		}
+		foreach($xpath->query('//hr') as $e )
+		{
+			$e->parentNode->removeChild($e);
+		}
 		foreach($xpath->query('//div[contains(attribute::class, "hf-nsheader")]') as $e )
 		{
 			$e->parentNode->removeChild($e);

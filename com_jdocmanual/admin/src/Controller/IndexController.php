@@ -13,7 +13,9 @@ namespace J4xdemos\Component\Jdocmanual\Administrator\Controller;
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\Database\ParameterType;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
@@ -33,6 +35,8 @@ class IndexController extends BaseController
 	public function fetch()
 	{
 		$app = Factory::getApplication();
+		$db = Factory::getDbo();
+		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 
 		// need parameters for fetch
 		$params = ComponentHelper::getParams('com_jdocmanual');
@@ -45,13 +49,38 @@ class IndexController extends BaseController
 		$url = $params->get('manual' . $active_manual . '_url');
 		// For Joomla 3
 		//$url = 'https://help.joomla.org/J3.x:Doc_Pages';
+		$active_language = $this->app->getUserState('com_jdocmanual.active_language', 'en');
 
-		$content = \file_get_contents($url);
+		// if the language is not English add the language code
+		$lang = ($active_language == 'en' ? '' : '/' . $active_language);
 
+		// if the page does not exist the first header will be 404
+		$content = @file_get_contents($url . $lang);
 		if (empty($content))
 		{
-			$app->enqueueMessage('Model: Failed to fetch contents', 'warning');
-			return false;
+			$content = @\file_get_contents($url);
+			if (empty($content))
+			{
+				$app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_FAIL'), 'warning');
+				return false;
+			}
+			if ($lang != 'en')
+			{
+				$app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_ENGLISH'), 'warning');
+				// check whether English content exists
+				$query = $db->getQuery(true);
+				$query->select('id')
+				->from('`#__jdocmanual_menu`')
+				->where('`menu_key` = :menu_key')
+				->where('`language_code` = ' . $db->quote('en'))
+				->bind(':menu_key' , $url, ParameterType::STRING);
+				$db->setQuery($query);
+				$fetched = $db->loadResult();
+				if ($fetched)
+				{
+					return false;
+				}
+			}
 		}
 
 		$dom = new \DOMDocument;
@@ -146,14 +175,15 @@ class IndexController extends BaseController
 		}
 
 		// save the menu in the database
-		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 		$query->insert('#__jdocmanual_menu')
-		->set('source_id = ' . $active_manual)
+		->set('language_code = :active_language')
+		->set('menu_key = :menu_key')
 		->set('menu = :menu')
-		->bind(':menu', $buffer);
+		->bind(':active_language', $active_language, ParameterType::STRING)
+		->bind(':menu_key', $url, ParameterType::STRING)
+		->bind(':menu', $buffer, ParameterType::STRING);
 		$db->setQuery($query);
 		$db->execute();
-		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 	}
 }
