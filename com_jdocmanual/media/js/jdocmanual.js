@@ -114,10 +114,11 @@ async function setPanelContent(itemId, title) {
 		document_panel.innerHTML = result;
 
 		if(document.querySelectorAll(("#scroll-panel h2, #scroll-panel h3")).length > 0) {
-			let html = '<div class="h3 mt-3">' + Joomla.Text._('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE') + '</div>';
+			let html = '<div class="h3 mt-3">' + Joomla.Text._('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE') + '</div><ul>';
 			document.querySelectorAll("#scroll-panel h2, #scroll-panel h3").forEach(function(element) {
 				html += '<li class="toc-link toc-link-' + element.localName + '">' + element.textContent + '</li>';
 			});
+			html += '</ul>';
 			document.querySelector("#toc-panel").innerHTML = html;
 			/* toc */
 			document.querySelectorAll(".toc-link").forEach(function(element, index) {

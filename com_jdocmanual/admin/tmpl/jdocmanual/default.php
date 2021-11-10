@@ -61,7 +61,7 @@ Text::script('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE', true);
 		</div>
 		<div class="col-12 col-md-9 document-title">
 			<div id="jdocmanual-main" class="row g-0">
-			<div class="col col-md-8" id="document-panel">
+			<div class="col col-md-8" id="document-panel" tabindex="0">
 				<div>
 					<?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FIRST_SELECT'); ?>
 				</div>

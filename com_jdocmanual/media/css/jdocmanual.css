@@ -97,3 +97,6 @@
 	padding-left: 1rem;
 }
 
+div#toc-panel ul {
+	padding-left: 0.5rem;
+}
