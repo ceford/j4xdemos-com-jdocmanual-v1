@@ -41,11 +41,11 @@ class JdocmanualModel extends ListModel
 		}
 		$url = $params->get('manual' . $active_manual . '_url');
 
-		$active_language = $app->getUserState('com_jdocmanual.active_language');
-		if (empty($active_language))
+		$index_language = $app->getUserState('com_jdocmanual.index_language');
+		if (empty($index_language))
 		{
-			$active_language = 'en';
-			$app->setUserState('com_jdocmanual.active_language', $active_language);
+			$index_language = 'en';
+			$app->setUserState('com_jdocmanual.index_language', $index_language);
 		}
 		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
@@ -55,12 +55,12 @@ class JdocmanualModel extends ListModel
 		->where('menu_key = :menu_key')
 		->where('language_code = :language_code')
 		->bind(':menu_key', $url, ParameterType::STRING)
-		->bind(':language_code', $active_language, ParameterType::STRING)
+		->bind(':language_code', $index_language, ParameterType::STRING)
 		->order('id desc');
-		//var_dump($url, $active_language, $query->__tostring());die;
+		//var_dump($url, $index_language, $query->__tostring());die;
 		$db->setQuery($query);
 		$menu = $db->loadObject();
-		if (empty($menu && $active_language != 'en'))
+		if (empty($menu && $index_language != 'en'))
 		{
 			// try again with English
 			$query = $db->getQuery(true);
@@ -71,7 +71,7 @@ class JdocmanualModel extends ListModel
 			->where('language_code = ' . $db->quote('en'))
 			->bind(':menu_key', $url, ParameterType::STRING)
 			->order('id desc');
-			//var_dump($url, $active_language, $query->__tostring());die;
+			//var_dump($url, $index_language, $query->__tostring());die;
 			$db->setQuery($query);
 			$menu = $db->loadObject();
 		}

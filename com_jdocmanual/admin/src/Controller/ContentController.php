@@ -35,6 +35,18 @@ class ContentController extends BaseController
 		$jform = $this->app->input->get('jform', array(), 'array');
 		$language = trim($jform['language']);
 		$this->app->setUserState('com_jdocmanual.active_language', $language);
+		setcookie('jdocmanualReset', 'reset', time() + 3600);
+		setcookie('jdocmanualTitle', '', time() - 3600);
+		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
+	}
+
+	public function selectindexlanguage()
+	{
+		$jform = $this->app->input->get('jform', array(), 'array');
+		$language = trim($jform['language']);
+		$this->app->setUserState('com_jdocmanual.index_language', $language);
+		setcookie('jdocmanualReset', 'reset', time() + 3600);
+		setcookie('jdocmanualTitle', '', time() - 3600);
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 	}
 

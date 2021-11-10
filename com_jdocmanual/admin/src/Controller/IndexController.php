@@ -49,10 +49,10 @@ class IndexController extends BaseController
 		$url = $params->get('manual' . $active_manual . '_url');
 		// For Joomla 3
 		//$url = 'https://help.joomla.org/J3.x:Doc_Pages';
-		$active_language = $this->app->getUserState('com_jdocmanual.active_language', 'en');
+		$index_language = $this->app->getUserState('com_jdocmanual.index_language', 'en');
 
 		// if the language is not English add the language code
-		$lang = ($active_language == 'en' ? '' : '/' . $active_language);
+		$lang = ($index_language == 'en' ? '' : '/' . $index_language);
 
 		// if the page does not exist the first header will be 404
 		$content = @file_get_contents($url . $lang);
@@ -177,10 +177,10 @@ class IndexController extends BaseController
 		// save the menu in the database
 		$query = $db->getQuery(true);
 		$query->insert('#__jdocmanual_menu')
-		->set('language_code = :active_language')
+		->set('language_code = :index_language')
 		->set('menu_key = :menu_key')
 		->set('menu = :menu')
-		->bind(':active_language', $active_language, ParameterType::STRING)
+		->bind(':index_language', $index_language, ParameterType::STRING)
 		->bind(':menu_key', $url, ParameterType::STRING)
 		->bind(':menu', $buffer, ParameterType::STRING);
 		$db->setQuery($query);

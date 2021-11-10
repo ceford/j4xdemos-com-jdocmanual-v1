@@ -47,7 +47,11 @@ let languages = document.getElementsByClassName("set-language");
 let setLanguage = function() {
 	let language_code = this.innerText;
 	let task = document.getElementById('task');
-	task.value = 'content.selectlanguage';
+	if (this.classList.contains('index')) {
+		task.value = 'content.selectindexlanguage';
+	} else {
+		task.value = 'content.selectlanguage';
+	}
 	let jform_language = document.getElementById('jform_language');
 	jform_language.value = language_code;
 	let form = document.getElementById('adminForm');

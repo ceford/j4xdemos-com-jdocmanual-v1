@@ -130,6 +130,8 @@ class HtmlView extends BaseHtmlView
 		$params = ComponentHelper::getParams('com_jdocmanual');
 		$active_manual = $app->getUserState('com_jdocmanual.active_manual');
 		$active_language = $app->getUserState('com_jdocmanual.active_language', 'en');
+		$index_language = $app->getUserState('com_jdocmanual.index_language', 'en');
+
 		if (empty($active_manual))
 		{
 			$active_manual = $params->get('default_manual');
@@ -182,6 +184,9 @@ class HtmlView extends BaseHtmlView
 		$languages = $params->get('languages');
 		$languages_list = (array) explode(',', $languages);
 
+		$childBar->separatorButton('page')
+		->text('Content Language');
+
 		foreach ($languages_list as $language)
 		{
 			$icon = '';
@@ -193,6 +198,23 @@ class HtmlView extends BaseHtmlView
 			->text($language)
 			->buttonClass('set-language')
 			->task('content.selectlanguage')
+			->icon($icon);
+		}
+
+		$childBar->separatorButton('index')
+		->text('Index Language');
+
+		foreach ($languages_list as $language)
+		{
+			$icon = '';
+			if ($index_language == $language)
+			{
+				$icon = 'icon-check';
+			}
+			$childBar->standardButton($language)
+			->text($language)
+			->buttonClass('set-language index')
+			->task('content.selectindexlanguage')
 			->icon($icon);
 		}
 
