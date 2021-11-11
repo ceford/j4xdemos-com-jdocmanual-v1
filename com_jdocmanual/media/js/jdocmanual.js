@@ -63,15 +63,17 @@ for (var i = 0; i < languages.length; i++) {
 }
 
 let toggle = document.getElementById('toggle-joomla-menu');
-toggle & toggle.addEventListener('click', function() {
-	let wrapper = document.getElementById('sidebar-wrapper');
-	style = getComputedStyle(wrapper);
-	if (style.display == 'none') {
-		wrapper.classList.remove('d-none');
-	} else {
-		wrapper.classList.add('d-none');
-	}
-})
+if(toggle) {
+	toggle.addEventListener('click', function() {
+		let wrapper = document.getElementById('sidebar-wrapper');
+		style = getComputedStyle(wrapper);
+		if (style.display == 'none') {
+			wrapper.classList.remove('d-none');
+		} else {
+			wrapper.classList.add('d-none');
+		}
+	})
+}
 
 let contents = document.getElementsByClassName("content-link");
 let anchors = null;
@@ -86,6 +88,13 @@ for (var i = 0; i < contents.length; i++) {
 }
 
 async function setPanelContent(itemId, title) {
+	let document_title = document.getElementById('document-title');
+	if (!document_title) {
+		return;
+	}
+	let document_panel = document.getElementById('document-panel');
+	let main_panel = document.getElementById('jdocmanual-main');
+
 	const d = new Date();
 	setCookie('jdocmanualItemId', itemId, 10);
 	setCookie('jdocmanualTitle', title, 10)
@@ -98,10 +107,6 @@ async function setPanelContent(itemId, title) {
 		method: 'POST',
 		body: data
 	}
-	let document_title = document.getElementById('document-title');
-	let document_panel = document.getElementById('document-panel');
-	let main_panel = document.getElementById('jdocmanual-main');
-
 	let response = await fetch(url, options);
 	if (!response.ok) {
 		document_panel.innerHTML = response.status;
