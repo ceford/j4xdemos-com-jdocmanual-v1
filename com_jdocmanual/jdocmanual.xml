@@ -49,4 +49,8 @@
 		</files>
 		<menu>com_jdocmanual</menu>
 	</administration>
+	<updateservers>
+		<!-- Note: No spaces or linebreaks allowed between the server tags -->
+		<server type="extension" name="Joomla Manual Update Site">https://raw.githubusercontent.com/ceford/j4xdemos-com-jdocmanual/master/manifest.xml</server>
+	</updateservers>
 </extension>
