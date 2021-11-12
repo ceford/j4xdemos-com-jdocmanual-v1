@@ -70,9 +70,9 @@ class IndexController extends BaseController
 				// check whether English content exists
 				$query = $db->getQuery(true);
 				$query->select('id')
-				->from('`#__jdocmanual_menu`')
-				->where('`menu_key` = :menu_key')
-				->where('`language_code` = ' . $db->quote('en'))
+				->from('#__jdocmanual_menu')
+				->where('menu_key = :menu_key')
+				->where('language_code = ' . $db->quote('en'))
 				->bind(':menu_key' , $url, ParameterType::STRING);
 				$db->setQuery($query);
 				$fetched = $db->loadResult();

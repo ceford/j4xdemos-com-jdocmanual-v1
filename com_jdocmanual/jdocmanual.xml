@@ -2,12 +2,12 @@
 <extension type="component" method="upgrade">
 	<name>com_jdocmanual</name>
 	<author>Clifford E Ford</author>
-	<creationDate>August 2021</creationDate>
+	<authorEmail>cliff@ford.myzen.co.uk</authorEmail>
+	<authorUrl>fford.me.uk</authorUrl>
+	<creationDate>October 2021</creationDate>
 	<copyright>(C) 2021 Clifford E Ford. All rights reserved.
 	</copyright>
 	<license>GNU General Public License version 3</license>
-	<authorEmail></authorEmail>
-	<authorUrl></authorUrl>
 	<version>0.4.0</version>
 	<description>COM_JDOCMANUAL_XML_DESCRIPTION</description>
 	<namespace path="src">J4xdemos\Component\Jdocmanual</namespace>
@@ -49,7 +49,7 @@
 		</files>
 		<menu 
 			link="option=com_jdocmanual&amp;view=jdocmanual"
-			img="class:default" alt="Jdocmanual"
+			img="class:default"
 		>
 			com_jdocmanual
 		</menu>
