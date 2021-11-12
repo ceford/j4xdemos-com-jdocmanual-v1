@@ -92,7 +92,7 @@
 			label="JCONFIG_PERMISSIONS_LABEL"
 			filter="rules"
 			validate="rules"
-			component="com_ffmedia"
+			component="com_jdocmanual"
 			section="component"
 		 />
 	</fieldset>
