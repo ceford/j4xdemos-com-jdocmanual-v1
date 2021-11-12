@@ -55,7 +55,7 @@ Text::script('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE', true);
 
 	<div class="row">
 		<div class="col-12 col-md-3 g-0">
-			<nav id="jdocmanual-wrapper" aria-label="Joomla Manual Menu" class="sidebar-wrapper sidebar-menu">
+			<nav id="jdocmanual-wrapper" aria-label="JDOC Manual Menu" class="sidebar-wrapper sidebar-menu">
 				<?php echo $this->menu->menu; ?>
 			</nav>
 		</div>

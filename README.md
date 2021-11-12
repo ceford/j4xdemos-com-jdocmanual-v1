@@ -1,4 +1,4 @@
-# Joomla Manual
+# JDOC Manual
 
 This component can display up to three different manuals
 located on Mediawiki servers provided an index document has 
@@ -20,7 +20,7 @@ looks just like the Joomla Administrator menu!
 With the index panel populated you can select an item from
 the list. On first selection the page is fetched from the
 document server, processed to make it suitable for display
-in the Joomla Manual component, and saved in the database.
+in the JDOC Manual component, and saved in the database.
 On a later request for that page it is fetched from the
 database.
 
