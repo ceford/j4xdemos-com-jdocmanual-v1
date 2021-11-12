@@ -47,14 +47,6 @@
 			<folder>src</folder>
 			<folder>tmpl</folder>
 		</files>
-		<menu 
-			link="option=com_jdocmanual&amp;view=jdocmanual"
-			img="class:default"
-		>
-			com_jdocmanual
-		</menu>
+		<menu>com_jdocmanual</menu>
 	</administration>
-	<dashboards>
-		<dashboard title="COM_JDOCMANUAL_DASHBOARD_TITLE" icon="icon-file-alt">jdocmanual</dashboard>
-	</dashboards>
 </extension>
