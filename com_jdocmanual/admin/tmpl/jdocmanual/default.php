@@ -42,14 +42,14 @@ Text::script('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE', true);
 		<div class="col-12 col-md-3 p-2" id="toggle-joomla-menu">
 			<a id="jd-collapse" href="#" aria-label="Toggle Joomla Menu">
 				<span id="jdocmanual-collapse-icon" class="icon-fw icon-toggle-off" aria-hidden="true"></span>
-				<span class="sidebar-item-title"><?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_TOGGLE_JOOMLA_MENU'); ?></span>
+				<span class=""><?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_TOGGLE_JOOMLA_MENU'); ?></span>
 			</a>
 		</div>
 
 		<div class="col-12 col-md-9 document-title">
-			<h1 id="document-title">
+			<h2 id="document-title">
 			<?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_DOCUMENT_TITLE'); ?>
-			</h1>
+			</h2>
 		</div>
 	</div>
 
@@ -61,12 +61,13 @@ Text::script('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE', true);
 		</div>
 		<div class="col-12 col-md-9 document-title">
 			<div id="jdocmanual-main" class="row g-0">
-			<div class="col col-md-8" id="document-panel" tabindex="0">
-				<div>
-					<?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FIRST_SELECT'); ?>
+				<div class="col col-md-8" id="document-panel" tabindex="0">
+					<div>
+						<?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FIRST_SELECT'); ?>
+					</div>
 				</div>
-			</div>
-			<div class="col-12 col-md-4 d-none d-md-block ps-3" id="toc-panel">
+				<div class="col-12 col-md-4 d-none d-md-block ps-3" id="toc-panel">
+				</div>
 			</div>
 		</div>
 	</div>

@@ -98,79 +98,77 @@ class IndexController extends BaseController
 
 		// convert back to html
 		$content = $newdom->saveHTML();
+		//<ul>
+		//<li>Getting Started
+		//<ul>
+		//<li><a href="/Special:MyLanguage/J4.x:Getting_Started_with_Joomla!" title="Special:MyLanguage/J4.x:Getting Started with Joomla!">Getting Started with Joomla!</a></li>
 
 		// remove all instances of 'title=...'
 		$pattern = '/ title=".*?"/sm';
 		$content = \preg_replace($pattern, '', $content);
 
 		// change the links
-		// <a href="https://help.joomla.org/proxy?keyref=
-		// <a class="content-link" href="#" data-content-id=
-		$pattern = '/="\//sm';
+		$pattern = '/="\/(?:Special:MyLanguage\/)/sm';
 		$replacement = '="#" class="content-link" data-content-id="';
 		$content = \preg_replace($pattern, $replacement, $content);
+		//<ul>
+		//<li>Getting Started
+		//<ul>
+		//<li><a href="#" class="content-link" data-content-id="J4.x:Getting_Started_with_Joomla!">Getting Started with Joomla!</a></li>echo $content;die;
 
 		// now go through line by line
 		$lines = preg_split("/((\r?\n)|(\r\n?))/", $content);
 
-		$line1 = true;
-		$buffer = '';
-		$collapse = 1001;
-		$collapse_level = 1;
-		$item_level = 1;
+		$buffer = '<div class="accordion" id="accordionJdoc">' . "\n";
+		$number = 1;
+		$nlines = count($lines);
 
-		foreach($lines as $line)
+		// a line like the following is the start of a menu block
+		// <li>Getting Started
+		// a line with a terminating </li> is within a menu block
+		foreach($lines as $i => $line)
 		{
-			// the first three lines:
-			// <ul>
-			// <li>Administrator
-			// <ul>
-			if ($line == '<ul>')
+			// the last line of input is </div>
+			if ($i == ($nlines - 4) || strpos($line, '</div>') !== false)
 			{
-				if ($line1)
+				$buffer .= '</div>' . "\n";
+				break;
+			}
+			if(strpos($line, '<li>') !== false)
+			{
+				if(strpos($line, '</li>') === false)
 				{
-					$buffer = '<ul id="menu1001" class="nav flex-column main-nav metismenu">' . "\n";
-					$line1 = false;
-					continue;
+					// this is menu level 1 - becomes accordion item
+					$buffer .= '<div class="accordion-item">' . "\n";
+					$buffer .= '<a href="#" class="accordion-header accordion-button jdocmenu-item" ';
+					$buffer .= 'id="item_'.$number.'" ';
+					$buffer .= 'data-bs-toggle="collapse" ';
+					$buffer .= 'data-bs-target="#collapse_'.$number.'" ';
+					$buffer .= 'aria-expanded="false" aria-controls="collapse_'.$number.'">' . "\n";
+					$buffer .= substr($line, 4) . "\n";
+					$buffer .= '</a>' . "\n";
+					$buffer .= '<div id="collapse_'.$number.'" class="accordion-collapse collapse" aria-labelledby="item_'.$number.'" data-bs-parent="#accordionJdoc">' . "\n";
+					$buffer .= '<div class="jdocmanual-accordion-body">' . "\n";
+					$buffer .= '<ul>' . "\n";
+					$number += 1;
 				}
 				else
 				{
-					$buffer .= '<ul id="collapse'.$collapse.'" class="collapse-level-'.$collapse_level.' mm-collapse">' . "\n";
-					$collapse += 1;
-					$item_level += 1;
-					continue;
+					// this is a regular link to go in the body
+					// but only if it contains an anchor
+					if (strpos($line, '<a ') !== false)
+					{
+						$line = str_replace('<a ', '<span class="icon-file-alt icon-fw icon-jdocmanual" aria-hidden="true"></span><a ', $line);
+						$buffer .= $line  . "\n";
+					}
 				}
 			}
-			elseif ($line == '</ul>')
+			else if (strpos($line, '</ul>') === 0)
 			{
 				$buffer .= $line . "\n";
-				$item_level -= 1;
-				continue;
-			}
-			elseif ($line =='</li>')
-			{
-				$buffer .= $line . "\n";
-				continue;
-			}
-			$li_item_class = '<li class="item item-level-'.$item_level.'">';
-			// title lines have no ending </li> and no link
-			if (strpos($line, '<li>') === 0)
-			{
-				if (mb_strstr($line, '<a'))
-				{
-					// line with a link - add a file icon
-					$line = \preg_replace('/(.*<a.*?>)/', '$1<span class="icon-file-alt icon-fw" aria-hidden="true"></span>', $line);
-					$buffer .= \str_replace('<li>', $li_item_class, $line) . "\n";
-					continue;
-				}
-				else
-				{
-					// line without a link so a heading
-					// <li class="item parent item-level-1"><a class="has-arrow" href="#" aria-label="Administrator" aria-expanded="true"><span class="icon-file-alt icon-fw" aria-hidden="true"></span><span class="sidebar-item-title">Administrator</span></a>
-					$title = str_replace('<li>', '', $line);
-					$buffer .= '<li class="item parent item-level-' . $item_level . '"><a class="has-arrow" href="#" aria-label="' . $title . '" aria-expanded="true"><span class="icon-folder icon-fw" aria-hidden="true"></span><span class="sidebar-item-title">' . $title . '</span></a>' . "\n";
-					continue;
-				}
+				$buffer .= '</div>' . "\n";
+				$buffer .= '</div>' . "\n";
+				$buffer .= '</div>' . "\n";
 			}
 		}
 

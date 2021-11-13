@@ -83,6 +83,29 @@
 	padding-left: 1rem;
 }
 
+.accordion-button {
+	padding: 0.5rem 1rem ! important;
+}
+
+.jdocmanual-accordion-body {
+	padding: 0.5rem 0.5rem 0.5rem 2rem;
+}
+
+.jdocmanual-accordion-body ul {
+	list-style-type: none;
+	margin-bottom: 0;
+	padding-left: 0;
+}
+
+.jdocmanual-accordion-body li {
+	margin-top: 0.25rem;
+}
+
+.icon-jdocmanual {
+	margin-left: -1.5rem;
+	padding-right: 0.5rem;
+}
+
 .toc-link {
 	margin: 0 0 0.25rem 0;
 	cursor: pointer;
