@@ -89,88 +89,36 @@ class IndexController extends BaseController
 		$dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 		libxml_clear_errors();
 
-		$newdom = new \DOMDocument;
-		$newdom->formatOutput = true;
 		$node = $dom->getElementById('jdocmanual-index');
+
+		$newdom = new \DOMDocument;
+		$newdom->loadXML("<root><someelement>text in some element</someelement></root>");
+
 		$node = $newdom->importNode($node, true);
-		// And then append it to the "<root>" node
-		$newdom->appendChild($node);
+		$newdom->documentElement->appendChild($node);
 
-		// convert back to html
-		$content = $newdom->saveHTML();
-		//<ul>
-		//<li>Getting Started
-		//<ul>
-		//<li><a href="/Special:MyLanguage/J4.x:Getting_Started_with_Joomla!" title="Special:MyLanguage/J4.x:Getting Started with Joomla!">Getting Started with Joomla!</a></li>
+		$id = 1;
+		$html = '<div class="accordion" id="accordionJdoc">';
 
-		// remove all instances of 'title=...'
-		$pattern = '/ title=".*?"/sm';
-		$content = \preg_replace($pattern, '', $content);
-
-		// change the links
-		$pattern = '/="\/(?:Special:MyLanguage\/)/sm';
-		$replacement = '="#" class="content-link" data-content-id="';
-		$content = \preg_replace($pattern, $replacement, $content);
-		//<ul>
-		//<li>Getting Started
-		//<ul>
-		//<li><a href="#" class="content-link" data-content-id="J4.x:Getting_Started_with_Joomla!">Getting Started with Joomla!</a></li>echo $content;die;
-
-		// now go through line by line
-		$lines = preg_split("/((\r?\n)|(\r\n?))/", $content);
-
-		$buffer = '<div class="accordion" id="accordionJdoc">' . "\n";
-		$number = 1;
-		$nlines = count($lines);
-
-		// a line like the following is the start of a menu block
-		// <li>Getting Started
-		// a line with a terminating </li> is within a menu block
-		foreach($lines as $i => $line)
+		foreach ($newdom->getElementsByTagName('ul')->item(0)->childNodes as $node)
 		{
-			// the last line of input is </div>
-			if ($i == ($nlines - 4) || strpos($line, '</div>') !== false)
+			if ($node->nodeType === XML_ELEMENT_NODE)
 			{
-				$buffer .= '</div>' . "\n";
-				break;
-			}
-			if(strpos($line, '<li>') !== false)
-			{
-				if(strpos($line, '</li>') === false)
+				if ($node->nodeName == 'li')
 				{
-					// this is menu level 1 - becomes accordion item
-					$buffer .= '<div class="accordion-item">' . "\n";
-					$buffer .= '<a href="#" class="accordion-header accordion-button jdocmenu-item" ';
-					$buffer .= 'id="item_'.$number.'" ';
-					$buffer .= 'data-bs-toggle="collapse" ';
-					$buffer .= 'data-bs-target="#collapse_'.$number.'" ';
-					$buffer .= 'aria-expanded="false" aria-controls="collapse_'.$number.'">' . "\n";
-					$buffer .= substr($line, 4) . "\n";
-					$buffer .= '</a>' . "\n";
-					$buffer .= '<div id="collapse_'.$number.'" class="accordion-collapse collapse" aria-labelledby="item_'.$number.'" data-bs-parent="#accordionJdoc">' . "\n";
-					$buffer .= '<div class="jdocmanual-accordion-body">' . "\n";
-					$buffer .= '<ul>' . "\n";
-					$number += 1;
-				}
-				else
-				{
-					// this is a regular link to go in the body
-					// but only if it contains an anchor
-					if (strpos($line, '<a ') !== false)
+					$value = $node->nodeValue;
+					$lines = preg_split("/((\r?\n)|(\r\n?))/", $value);
+					$html .= $this->accordion_start ($id, $lines[0]);
+					$id += 1;
+					foreach ($node->getElementsByTagName('a') as $child)
 					{
-						$line = str_replace('<a ', '<span class="icon-file-alt icon-fw icon-jdocmanual" aria-hidden="true"></span><a ', $line);
-						$buffer .= $line  . "\n";
+						$html .= $this->accordion_item($child->getAttribute('href'), $child->nodeValue);
 					}
+					$html .= $this->accordion_end ();
 				}
-			}
-			else if (strpos($line, '</ul>') === 0)
-			{
-				$buffer .= $line . "\n";
-				$buffer .= '</div>' . "\n";
-				$buffer .= '</div>' . "\n";
-				$buffer .= '</div>' . "\n";
 			}
 		}
+		$html .= "\n</div>\n";
 
 		// save the menu in the database
 		$query = $db->getQuery(true);
@@ -180,8 +128,37 @@ class IndexController extends BaseController
 		->set('menu = :menu')
 		->bind(':index_language', $index_language, ParameterType::STRING)
 		->bind(':menu_key', $url, ParameterType::STRING)
-		->bind(':menu', $buffer, ParameterType::STRING);
+		->bind(':menu', $html, ParameterType::STRING);
 		$db->setQuery($query);
 		$db->execute();
 	}
+
+	protected function accordion_start ($id, $label)
+	{
+		$html =<<<EOF
+<div class="accordion-item">
+<a href="#" class="accordion-header accordion-button jdocmenu-item" id="item_{$id}" data-bs-toggle="collapse" data-bs-target="#collapse_{$id}" aria-expanded="false" aria-controls="collapse_{$id}">
+{$label}
+</a>
+<div id="collapse_{$id}" class="accordion-collapse collapse" aria-labelledby="item_{$id}" data-bs-parent="#accordionJdoc">
+<div class="jdocmanual-accordion-body">
+<ul>
+EOF;
+		return $html;
+	}
+
+	protected function accordion_end ()
+	{
+		return "\n</ul>\n</div>\n</div>\n</div>\n";
+	}
+
+	protected function accordion_item($link, $value)
+	{
+		$link = preg_replace('/\/Special:MyLanguage\//', '', $link);
+		$html ='<li><span class="icon-file-alt icon-fw icon-jdocmanual" aria-hidden="true"></span>';
+		$html .= '<a href="#" class="content-link" data-content-id="' . $link . '">';
+		$html .= $value . '</a></li>' . "\n";
+		return $html;
+	}
+
 }
