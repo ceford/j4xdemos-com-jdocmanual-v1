@@ -14,8 +14,8 @@ After installation you first need to fetch the index
 document by selecting the <strong>Fetch Index</strong> button
 in the toolbar. Each time you do this the index is fetched
 and stored as html in a new entry in the database. This is 
-what appears in the component index panel at the left. It
-looks just like the Joomla Administrator menu!
+what appears in the component index panel at the left of the 
+content area.
 
 With the index panel populated you can select an item from
 the list. On first selection the page is fetched from the
@@ -34,8 +34,9 @@ need to set up the language list in the component
 the <strong>Language</strong> button in the toolbar. If the
 document is not available in the selected language you will
 see the English version with a message to that effect at 
-the top. You can select the Index language and Document languages separately but it will be a while before there are any 
-translated indexes.
+the top. You can select the Index language and Document languages 
+separately but it will be a while before many indexes are 
+translated.
 
 The version of the page displayed in the Manual differs
 from the original as follows:
