@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 	if (getCookie('jdocmanualReset')) {
 		eraseCookie('jdocmanualItemId');
 		eraseCookie('jdocmanualTitle');
+		eraseCookie('jdocmanualLastHeading');
 	} else {
 		// if cookies exist - jdocmanualItemId and jdocmanualTitle
 		if (getCookie('jdocmanualItemId')) {
@@ -152,4 +153,20 @@ document.addEventListener('DOMContentLoaded', function(event) {
 			setPanelContent(itemId, title);
 		}
 	}
+
+	let collapses = document.getElementsByClassName("accordion-collapse");
+	if (collapses) {
+		for (var i = 0; i < collapses.length; i++) {
+			collapses[i].addEventListener('show.bs.collapse', function(e){
+				setCookie('jdocmanualLastHeading', this.id, 10)
+			}, false);
+		}
+	}
+
+	let collapse = document.getElementById('collapse_1');
+	let lastHeading = getCookie('jdocmanualLastHeading');
+	if (lastHeading) {
+		collapse = document.getElementById(lastHeading);
+	}
+	collapse.classList.add('show');
 });
