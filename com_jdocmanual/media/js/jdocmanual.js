@@ -94,6 +94,7 @@ async function setPanelContent(itemId, title) {
 	}
 	let document_panel = document.getElementById('document-panel');
 	let main_panel = document.getElementById('jdocmanual-main');
+	let jdocmanual_original = document.getElementById('jdocmanual-original');
 
 	const d = new Date();
 	setCookie('jdocmanualItemId', itemId, 10);
@@ -113,10 +114,12 @@ async function setPanelContent(itemId, title) {
 		throw new Error (Joomla.Text._('COM_MYCOMPONENT_JS_ERROR_STATUS') + `${response.status}`);
 	} else {
 		let result = await response.text();
-		let h1 = '<div class="document-title"><h1>' + title + '</h1></div>\n';
 
 		document_title.innerText = title;
 		document_panel.innerHTML = result;
+		// jdocmanual_active_url is in the page at load time
+		jdocmanual_original.href = jdocmanual_active_url + itemId;
+		jdocmanual_original.classList.remove('d-none');
 
 		if(document.querySelectorAll(("#scroll-panel h2, #scroll-panel h3")).length > 0) {
 			let html = '<div class="h3 mt-3">' + Joomla.Text._('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE') + '</div><ul>';

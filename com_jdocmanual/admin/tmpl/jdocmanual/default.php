@@ -20,7 +20,8 @@ $params = ComponentHelper::getParams('com_jdocmanual');
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useStyle('com_jdocmanual.jdocmanual')
-->useScript('com_jdocmanual.jdocmanual');
+->useScript('com_jdocmanual.jdocmanual')
+->addInlineScript("let jdocmanual_active_url = '{$this->jdocmanual_active_url}';\n");
 
 Text::script('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE', true);
 
@@ -50,6 +51,7 @@ Text::script('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE', true);
 			<h2 id="document-title">
 			<?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_DOCUMENT_TITLE'); ?>
 			</h2>
+			<a href="#" target="_blank" id="jdocmanual-original" class="btn btn-sm btn-outline-dark d-none mt-1"><?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_ORIGINAL'); ?></a>
 		</div>
 	</div>
 

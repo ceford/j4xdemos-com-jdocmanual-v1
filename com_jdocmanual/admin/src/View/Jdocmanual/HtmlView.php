@@ -81,13 +81,8 @@ class HtmlView extends BaseHtmlView
 	 */
 	protected $state;
 
-	/**
-	 * The media tree
-	 *
-	 * @var    Array
-	 * @since  4.0
-	 */
-	protected $tree;
+
+	protected $active_manual;
 
 	/**
 	 * Method to display the view.
@@ -137,6 +132,8 @@ class HtmlView extends BaseHtmlView
 			$active_manual = $params->get('default_manual');
 		}
 		$manual = $params->get('manual' . $active_manual . '_name');
+		$manual_url = $params->get('manual' . $active_manual . '_url');
+		$this->jdocmanual_active_url = substr($manual_url, 0, strrpos($manual_url, '/') + 1);
 
 		ToolbarHelper::title($manual . ' (' . $active_language . ')', 'book');
 

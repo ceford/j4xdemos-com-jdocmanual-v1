@@ -123,3 +123,9 @@
 div#toc-panel ul {
 	padding-left: 0.5rem;
 }
+
+#jdocmanual-original {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
