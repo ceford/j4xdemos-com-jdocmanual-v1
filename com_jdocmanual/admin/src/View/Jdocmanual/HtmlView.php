@@ -149,24 +149,27 @@ class HtmlView extends BaseHtmlView
 		$childBar = $dropdown->getChildToolbar();
 
 		// ToDo: change to cycle through manuals from params
+		$icon = $active_manual == 1 ? 'icon-check' : '';
 		$childBar->standardButton('manual1')
 		->text($params->get('manual1_name'))
-		->icon('icon-book')
+		->icon($icon)
 		->task('content.selectmanual1');
 
+		$icon = $active_manual == 2 ? 'icon-check' : '';
 		if (!empty($params->get('manual2_name')))
 		{
 			$childBar->standardButton('manual2')
 			->text($params->get('manual2_name'))
-			->icon('icon-book')
+			->icon($icon)
 			->task('content.selectmanual2');
 		}
 
+		$icon = $active_manual == 3 ? 'icon-check' : '';
 		if (!empty($params->get('manual3_name')))
 		{
 			$childBar->standardButton('manual3')
 			->text($params->get('manual3_name'))
-			->icon('icon-book')
+			->icon($icon)
 			->task('content.selectmanual3');
 		}
 

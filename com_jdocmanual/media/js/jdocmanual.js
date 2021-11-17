@@ -110,7 +110,7 @@ async function setPanelContent(itemId, title) {
   const token = Joomla.getOptions('csrf.token', '');
   let url = 'index.php?option=com_jdocmanual&task=content.fillpanel';
   let data = new URLSearchParams();
-  data.append(`itemId`, itemId);
+  data.append('itemId', itemId);
   data.append(token, 1);
   const options = {
     body: data,
@@ -119,7 +119,7 @@ async function setPanelContent(itemId, title) {
   let response = await fetch(url, options);
   if (!response.ok) {
     document_panel.innerHTML = response.status;
-    throw new Error (Joomla.Text._('COM_MYCOMPONENT_JS_ERROR_STATUS') + `${response.status}`);
+    throw new Error (Joomla.Text._('COM_MYCOMPONENT_JS_ERROR_STATUS'));
   } else {
     let result = await response.text();
 
@@ -174,10 +174,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
   let collapses = document.getElementsByClassName("accordion-collapse");
   if (collapses) {
     for (i = 0; i < collapses.length; i += 1) {
-      collapses[i].addEventListener('show.bs.collapse', function(e){
-        setCookie('jdocmanualLastHeading', this.id, 10);
-      }, false);
+      collapses[i].addEventListener('show.bs.collapse', saveLastHeading, false);
     }
+  }
+
+  function saveLastHeading() {
+    setCookie('jdocmanualLastHeading', this.id, 10);
   }
 
   let collapse = document.getElementById('collapse_1');
