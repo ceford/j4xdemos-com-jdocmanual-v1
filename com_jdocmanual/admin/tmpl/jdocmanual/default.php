@@ -15,13 +15,15 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
-$params = ComponentHelper::getParams('com_jdocmanual');
+$active_language = Factory::getApplication()->getUserState('com_jdocmanual.active_language', 'en');
+$scripts = "let jdocmanual_active_url = '{$this->jdocmanual_active_url}';\n";
+$scripts .= "let jdocmanual_active_language = '{$active_language}';\n";
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useStyle('com_jdocmanual.jdocmanual')
 ->useScript('com_jdocmanual.jdocmanual')
-->addInlineScript("let jdocmanual_active_url = '{$this->jdocmanual_active_url}';\n");
+->addInlineScript($scripts);
 
 Text::script('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE', true);
 
