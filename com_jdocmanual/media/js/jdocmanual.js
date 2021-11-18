@@ -151,7 +151,6 @@ async function setPanelContent(itemId, title) {
       document.querySelectorAll(".toc-link").forEach(function(element, index) {
         element.setAttribute('data-index', index);
         element.addEventListener('click', scrolltoheading, false);
-        window.scrollTo(0, 0);
       });
     }
   }
