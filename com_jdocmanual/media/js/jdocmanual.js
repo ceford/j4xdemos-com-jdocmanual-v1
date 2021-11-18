@@ -95,6 +95,13 @@ for (i = 0; i < contents.length; i += 1) {
   contents[i].addEventListener('click', getPage, false);
 }
 
+function scrolltoheading() {
+  document.querySelectorAll("#scroll-panel h2, #scroll-panel h3")[this.getAttribute('data-index')].scrollIntoView(
+  {
+    behavior: 'smooth', block: 'start'
+  });
+}
+
 async function setPanelContent(itemId, title) {
   let document_title = document.getElementById('document-title');
   if (!document_title) {
@@ -127,7 +134,7 @@ async function setPanelContent(itemId, title) {
     document_panel.innerHTML = result;
     // jdocmanual_active_url is in the page at load time
     let lang = '';
-    if (jdocmanual_active_language !== 'en') {
+    if (jdocmanual_active_language && jdocmanual_active_language !== 'en') {
       lang = '/' + jdocmanual_active_language;
     }
     jdocmanual_original.href = jdocmanual_active_url + itemId + lang;
@@ -143,14 +150,8 @@ async function setPanelContent(itemId, title) {
       /* toc */
       document.querySelectorAll(".toc-link").forEach(function(element, index) {
         element.setAttribute('data-index', index);
-        element.addEventListener('click', function() {
-          document.querySelectorAll("#scroll-panel h2, #scroll-panel h3")[this.getAttribute('data-index')].scrollIntoView(
-           {
-              behavior: 'smooth', block: 'start'
-            }
-          );
-          window.scrollTo(0, 0);
-        });
+        element.addEventListener('click', scrolltoheading, false);
+        window.scrollTo(0, 0);
       });
     }
   }
