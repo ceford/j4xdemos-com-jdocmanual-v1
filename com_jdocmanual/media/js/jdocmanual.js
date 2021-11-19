@@ -14,8 +14,10 @@ function setCookie(name, value, days) {
 
   if (days) {
     date.setTime(date.getTime()+(days*24*60*60*1000));
-    expires = "; expires="+date.toGMTString();
+  } else {
+    date.setTime(date.getTime());
   }
+  expires = "; expires="+date.toGMTString();
   if (typeof root === undefined) {
     path = "; path=/";
   } else {
@@ -46,7 +48,7 @@ function getCookie(name) {
  * eraseCookie by name
  */
 function eraseCookie(name) {
-  setCookie(name,'',-1);
+  setCookie(name,'',0);
 }
 
 /**

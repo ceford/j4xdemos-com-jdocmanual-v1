@@ -30,13 +30,29 @@ class ContentController extends BaseController
 	protected $app;
 	protected $update = false;
 
+	protected function setjdocmanualcookie($name, $value, $days)
+	{
+		if (!empty($days))
+		{
+			$offset = time() + $days*24*60*60;
+		}
+		else
+		{
+			$offset = 0;
+		}
+		$cookie_domain = $this->app->get('cookie_domain', '');
+		$cookie_path   = $this->app->get('cookie_path', '/');
+		$cookie = session_get_cookie_params();
+		setcookie($name, $value, $offset, $cookie_path, $cookie_domain, $cookie['secure'], true);
+	}
+
 	public function selectlanguage()
 	{
 		$jform = $this->app->input->get('jform', array(), 'array');
 		$language = trim($jform['language']);
 		$this->app->setUserState('com_jdocmanual.active_language', $language);
-		setcookie('jdocmanualReset', 'reset', time() + 3600);
-		setcookie('jdocmanualTitle', '', time() - 3600);
+		$this->setjdocmanualcookie('jdocmanualReset', 'reset', 1);
+		$this->setjdocmanualcookie('jdocmanualTitle', '', 0);
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 	}
 
@@ -45,8 +61,8 @@ class ContentController extends BaseController
 		$jform = $this->app->input->get('jform', array(), 'array');
 		$language = trim($jform['language']);
 		$this->app->setUserState('com_jdocmanual.index_language', $language);
-		setcookie('jdocmanualReset', 'reset', time() + 3600);
-		setcookie('jdocmanualTitle', '', time() - 3600);
+		$this->setjdocmanualcookie('jdocmanualReset', 'reset', 1);
+		$this->setjdocmanualcookie('jdocmanualTitle', '', 0);
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 	}
 
@@ -71,9 +87,9 @@ class ContentController extends BaseController
 	protected function reset($id)
 	{
 		// unset the cookies
-		setcookie('jdocmanualReset', 'reset', time() + 3600);
-		setcookie('jdocmanualItemId', '', time() - 3600);
-		setcookie('jdocmanualTitle', '', time() - 3600);
+		$this->setjdocmanualcookie('jdocmanualReset', 'reset', 1);
+		$this->setjdocmanualcookie('jdocmanualItemId', '', 0);
+		$this->setjdocmanualcookie('jdocmanualTitle', '', 0);
 		// set the active manual
 		$this->app->setUserState('com_jdocmanual.active_manual', $id);
 	}
@@ -101,7 +117,7 @@ class ContentController extends BaseController
 			$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 			return;
 		}
-		setcookie('jdocmanualReset', 'reset', time() - 3600);
+		//$this->setjdocmanualcookie('jdocmanualReset', '', 0);
 		$this->fill();
 	}
 
