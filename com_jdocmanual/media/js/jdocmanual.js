@@ -1,7 +1,8 @@
-let i = 0;
 
-//===== Cookie handlers ===================================
-
+/**
+ * setCookie for consistent cookie handling
+ * 
+ */
 function setCookie(name, value, days) {
   let expires = "";
   let date = new Date();
@@ -23,12 +24,13 @@ function setCookie(name, value, days) {
   document.cookie = name + "=" + value + expires + path + samesite;
 }
 
-//=========================================================
-
+/**
+ * getCookie - return cookie by name
+ */
 function getCookie(name) {
   let nameEQ = name + "=";
   let ca = document.cookie.split(";");
-  for (i = 0; i < ca.length; i += 1) {
+  for (let i = 0; i < ca.length; i += 1) {
     let c = ca[i];
     while (c.charAt(0) === " ") {
       c = c.substring(1,c.length);
@@ -40,13 +42,16 @@ function getCookie(name) {
   return null;
 }
 
-//=========================================================
-
+/**
+ * eraseCookie by name
+ */
 function eraseCookie(name) {
   setCookie(name,'',-1);
 }
 
-// ===== languages =====
+/**
+ * Select index language or content language
+ */
 
 let languages = document.getElementsByClassName('set-language');
 
@@ -64,11 +69,13 @@ let setLanguage = function() {
   form.submit();
 };
 
-for (i = 0; i < languages.length; i += 1) {
+for (let i = 0; i < languages.length; i += 1) {
   languages[i].addEventListener('click', setLanguage, false);
 }
 
-// ===== Joomla menu toggle =====
+/**
+ * Joomla menu toggle - hide or show the Joomla menu
+ */
 
 let toggle = document.getElementById('toggle-joomla-menu');
 
@@ -84,17 +91,9 @@ if(toggle) {
   });
 }
 
-let contents = document.getElementsByClassName("content-link");
-
-let getPage = function() {
-  let link_id = this.getAttribute('data-content-id');
-  setPanelContent(link_id, this.innerText);
-};
-
-for (i = 0; i < contents.length; i += 1) {
-  contents[i].addEventListener('click', getPage, false);
-}
-
+/**
+ * click on an item in the 'In this page' column to scroll into view
+ */
 function scrolltoheading() {
   document.querySelectorAll("#scroll-panel h2, #scroll-panel h3")[this.getAttribute('data-index')].scrollIntoView(
   {
@@ -102,6 +101,23 @@ function scrolltoheading() {
   });
 }
 
+/**
+ * Set the page content by clicking a page item in the index
+ */
+let contents = document.getElementsByClassName("content-link");
+
+let getPage = function() {
+  let link_id = this.getAttribute('data-content-id');
+  setPanelContent(link_id, this.innerText);
+};
+
+for (let i = 0; i < contents.length; i += 1) {
+  contents[i].addEventListener('click', getPage, false);
+}
+
+/**
+ * fetch the page from source, display in centre and create 'In this page'
+ */
 async function setPanelContent(itemId, title) {
   let document_title = document.getElementById('document-title');
   if (!document_title) {
@@ -111,9 +127,10 @@ async function setPanelContent(itemId, title) {
   let main_panel = document.getElementById('jdocmanual-main');
   let jdocmanual_original = document.getElementById('jdocmanual-original');
 
-  const d = new Date();
   setCookie('jdocmanualItemId', itemId, 10);
   setCookie('jdocmanualTitle', title, 10);
+
+  // get token from javascript loaded in the page
   const token = Joomla.getOptions('csrf.token', '');
   let url = 'index.php?option=com_jdocmanual&task=content.fillpanel';
   let data = new URLSearchParams();
@@ -132,14 +149,17 @@ async function setPanelContent(itemId, title) {
 
     document_title.innerText = title;
     document_panel.innerHTML = result;
-    // jdocmanual_active_url is in the page at load time
+
+    // create the link for the Original button and show it
     let lang = '';
     if (jdocmanual_active_language && jdocmanual_active_language !== 'en') {
       lang = '/' + jdocmanual_active_language;
     }
+    // jdocmanual_active_url is javascript in the page at load time
     jdocmanual_original.href = jdocmanual_active_url + itemId + lang;
     jdocmanual_original.classList.remove('d-none');
 
+    // create the Table of Contents
     if(document.querySelectorAll("#scroll-panel h2, #scroll-panel h3").length > 0) {
       let html = '<div class="h3 mt-3">' + Joomla.Text._('COM_JDOCMANUAL_JDOCMANUAL_TOC_IN_THIS_PAGE') + '</div><ul>';
       document.querySelectorAll("#scroll-panel h2, #scroll-panel h3").forEach(function(element) {
@@ -153,9 +173,14 @@ async function setPanelContent(itemId, title) {
         element.addEventListener('click', scrolltoheading, false);
       });
     }
+    // scroll the content area to the first heading on content load
+    document.querySelectorAll(".toc-link")[0].click();
   }
 }
 
+/**
+ * Set up after page load after change of Manual, etc
+ */
 document.addEventListener('DOMContentLoaded', function(event) {
   // has a jdocmanualReset cookie been set
   if (getCookie('jdocmanualReset')) {
@@ -171,9 +196,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
     }
   }
 
+  // remember which Index heading was open last
   let collapses = document.getElementsByClassName("accordion-collapse");
   if (collapses) {
-    for (i = 0; i < collapses.length; i += 1) {
+    for (let i = 0; i < collapses.length; i += 1) {
       collapses[i].addEventListener('show.bs.collapse', saveLastHeading, false);
     }
   }
@@ -182,10 +208,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
     setCookie('jdocmanualLastHeading', this.id, 10);
   }
 
+  // open the last Index heading or the first heading
   let collapse = document.getElementById('collapse_1');
   let lastHeading = getCookie('jdocmanualLastHeading');
   if (lastHeading) {
     collapse = document.getElementById(lastHeading);
   }
-  collapse.classList.add('show');
+  collapse && collapse.classList.add('show');
 });
