@@ -46,63 +46,8 @@ class ContentController extends BaseController
 		setcookie($name, $value, $offset, $cookie_path, $cookie_domain, $cookie['secure'], true);
 	}
 
-	public function selectlanguage()
-	{
-		$jform = $this->app->input->get('jform', array(), 'array');
-		$language = trim($jform['language']);
-		$this->app->setUserState('com_jdocmanual.active_language', $language);
-		$this->setjdocmanualcookie('jdocmanualReset', 'reset', 1);
-		$this->setjdocmanualcookie('jdocmanualTitle', '', 0);
-		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
-	}
-
-	public function selectindexlanguage()
-	{
-		$jform = $this->app->input->get('jform', array(), 'array');
-		$language = trim($jform['language']);
-		$this->app->setUserState('com_jdocmanual.index_language', $language);
-		$this->setjdocmanualcookie('jdocmanualReset', 'reset', 1);
-		$this->setjdocmanualcookie('jdocmanualTitle', '', 0);
-		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
-	}
-
-	public function selectmanual1()
-	{
-		$this->reset(1);
-		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
-	}
-
-	public function selectmanual2()
-	{
-		$this->reset(2);
-		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
-	}
-
-	public function selectmanual3()
-	{
-		$this->reset(3);
-		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
-	}
-
-	protected function reset($id)
-	{
-		// unset the cookies
-		$this->setjdocmanualcookie('jdocmanualReset', 'reset', 1);
-		$this->setjdocmanualcookie('jdocmanualItemId', '', 0);
-		$this->setjdocmanualcookie('jdocmanualTitle', '', 0);
-		// set the active manual
-		$this->app->setUserState('com_jdocmanual.active_manual', $id);
-	}
-
 	public function update()
 	{
-		$id = $this->app->getUserState('com_jdocmanual.active_page');
-		if (empty($id))
-		{
-			$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_UPDATE_PAGE_FAIL_NO_ID'), 'warning');
-			$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
-			return;
-		}
 		$this->update = true;
 		$this->fill();
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
@@ -121,33 +66,29 @@ class ContentController extends BaseController
 		$this->fill();
 	}
 
-	protected function get_http_response_code($url) {
-		$headers = get_headers($url);
-		return substr($headers[0], 9, 3);
-	}
-
 	protected function fill()
 	{
 		$db = Factory::getDbo();
-		$active_language = $this->app->getUserState('com_jdocmanual.active_language', 'en');
-		if ($this->update == true)
+
+		$manual_id = $this->app->input->get('manual_id', 0, 'int');
+		$item_id = $this->app->input->get('item_id', '', 'string');
+		$page_language_code = $this->app->input->get('page_language_code', '', 'string');
+
+		$page_language_code = empty($page_language_code) ? 'en' : $page_language_code;
+
+		if ($this->update !== true)
 		{
-			$id = $this->app->getUserState('com_jdocmanual.active_page');
-		}
-		else
-		{
-			$id = $this->input->getString('itemId');
 			// is the required page already downloaded?
 			$query = $db->getQuery(true);
+
 			$query->select('jp.jdoc_key, jp.content')
 			->from('#__jdocmanual_pages AS jp')
 			->where('jp.jdoc_key = :itemId')
-			->where('language_code = ' . $db->quote($active_language))
-			->bind(':itemId', $id, ParameterType::STRING);
-
+			->where('jp.language_code = :page_language_code')
+			->bind(':itemId', $item_id, ParameterType::STRING)
+			->bind(':page_language_code', $page_language_code, ParameterType::STRING);
 			$db->setQuery($query);
 			$row = $db->loadObject();
-			$this->app->setUserState('com_jdocmanual.active_page', $id);
 
 			// if content is not empty echo and exit
 			if (!empty($row->content))
@@ -158,27 +99,35 @@ class ContentController extends BaseController
 
 		// fetch the page from source
 
-		// need parameters for fetch
-		$params = ComponentHelper::getParams('com_jdocmanual');
+		$query = $db->getQuery(true);
+		$query->select('index_url')
+		->from('#__jdocmanual_sources')
+		->where('id = :id')
+		->bind(':id', $manual_id);
+		$db->setQuery($query);
+		$url = $db->loadResult();
 
-		$active_manual = $this->app->getUserState('com_jdocmanual.active_manual');
-		if (empty($active_manual))
-		{
-			$active_manual = $params->get('default_manual');
-		}
-		$url = $params->get('manual' . $active_manual . '_url');
+		$image_url = 'https://' . parse_url($url, PHP_URL_HOST);
 
 		// keep everything up to the last /
 		$url = substr($url, 0, strrpos($url,'/')+1);
 
-		// if the language is not English add the language coe
-		$lang = ($active_language == 'en' ? '' : '/' . $active_language);
+		// if the url contains proxy
+		if (strpos($url, 'proxy') !== false)
+		{
+			$url .= '?page=';
+		}
+
+		// if the language is not English add the language code
+		$lang = ($page_language_code == 'en' ? '' : '/' . $page_language_code);
 		$lang_unavailable = false;
+
 		// if the page does not exist the first header will be 404
-		$content = @file_get_contents($url . $id . $lang);
+
+		$content = @file_get_contents($url . $item_id . $lang);
 		if (empty($content))
 		{
-			$content = file_get_contents($url . $id);
+			$content = file_get_contents($url . $item_id);
 			if (empty($content))
 			{
 				echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL');
@@ -195,6 +144,13 @@ class ContentController extends BaseController
 		$newdom = new \DOMDocument;
 		$newdom->formatOutput = true;
 		$node = $dom->getElementById('mw-content-text');
+
+		// node could be empty so try to get the outermost div
+		if (empty($node))
+		{
+			$node = $dom->getElementsByTagName('div')[0]; // 'mw-parser-output')[0];
+		}
+
 		$node = $newdom->importNode($node, true);
 
 		// And then append it to the "<root>" node
@@ -232,6 +188,11 @@ class ContentController extends BaseController
 		{
 			$e->parentNode->removeChild($e);
 		}
+		// the [Edit] after a title
+		foreach($xpath->query('//span[contains(attribute::class, "mw-editsection")]') as $e )
+		{
+			$e->parentNode->removeChild($e);
+		}
 
 		$content = $newdom->saveHTML();
 
@@ -240,8 +201,23 @@ class ContentController extends BaseController
 		$content = \preg_replace($pattern, '', $content);
 
 		// imges need a full url src="/... to src="http.../
-		$pattern = '/\/images\//';
-		$replace = $url . '\/images\//';
+		$pattern = '/src="/';
+		$replace =  'src="' . $image_url;
+		$content = \preg_replace($pattern, $replace, $content);
+
+		// tricky - do first item in srcset
+		$pattern = '/srcset="/';
+		$replace =  'srcset="' . $image_url;
+		$content = \preg_replace($pattern, $replace, $content);
+
+		// so any images with preceding space must be in a srcset
+		$pattern = '/,\s\/images\//';
+		$replace =  ', ' . $image_url . '/images/';
+		$content = \preg_replace($pattern, $replace, $content);
+
+		// but my mediawiki site is planting inline style
+		$pattern = '/style="width:\d{1,}px;"/';
+		$replace =  '';
 		$content = \preg_replace($pattern, $replace, $content);
 
 		// remove links
@@ -267,17 +243,16 @@ class ContentController extends BaseController
 		{
 			$query->update('#__jdocmanual_pages')
 			->where('jdoc_key = :id')
-			->bind(':id', $id);
+			->bind(':id', $item_id);
 		} else {
 			$query->insert('#__jdocmanual_pages')
 			->set('jdoc_key = :id')
-			->bind(':id', $id);
+			->bind(':id', $item_id);
 		}
-		$query->set('language_code = ' . $db->quote($active_language))
+		$query->set('language_code = ' . $db->quote($page_language_code))
 		->set('content = ' . $db->quote($content));
 		$db->setQuery($query);
 		$db->execute();
-		$this->app->setUserState('com_jdocmanual.active_page', $id);
 		$this->send_template($content);
 	}
 
@@ -288,8 +263,9 @@ class ContentController extends BaseController
 		echo '</div>';
 		if ($this->update)
 		{
+			$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_UPDATE_PAGE_SUCCESS'), 'success');
 			return;
 		}
-		jexit();
+		exit;
 	}
 }

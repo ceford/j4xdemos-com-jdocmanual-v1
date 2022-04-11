@@ -1,14 +1,16 @@
 # JDOC Manual
 
-This component can display up to three different manuals
-located on Mediawiki servers provided an index document has 
-been created for each. For example, you may wish to switch 
+This component can display pages from a Mediawiki server with 
+the aid of an index document. For example, you may wish to switch 
 from Joomla 4 documents to Joomla 3 documents and to see 
 documents for a custom component delivered by a custom 
-Mediawiki server. The sources are set up in the component 
-Options. The default installation has indexes for Joomla 4, 
-Joomla 4 Help Screens, and Joomla 3. The indexes need to be 
+Mediawiki server. The sources and languages to use are stored
+in component database tables. The default installation has indexes 
+for Joomla 4 and Joomla 4 Help Screens. The indexes need to be 
 updated regularly.
+
+New in version 0.5: a Site page. Please uninstall any previous 
+version before installing this new version.
 
 After installation you first need to fetch the index
 document by selecting the <strong>Fetch Index</strong> button
@@ -28,9 +30,8 @@ If you have reason to believe that the page may be out of
 date you can select the <strong>Update Page</strong> button 
 to re-fetch the page from source.
 
-If you want to see the page in a different language you
-need to set up the language list in the component 
-<strong>Options</strong> and then select the language from
+If you want to see the page in a different language you need 
+to set up the language list and then select the language from
 the <strong>Language</strong> button in the toolbar. If the
 document is not available in the selected language you will
 see the English version with a message to that effect at 

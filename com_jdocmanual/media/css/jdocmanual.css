@@ -1,10 +1,13 @@
 @charset "UTF-8";
 
 #jdocmanual-wrapper {
-	height: 70vh;
+	height: 100vh;
 	overflow-y: auto;
 	min-height: 70vh;
 	max-width: unset;
+	position: sticky;
+	top: 0;
+	left: 0;
 	z-index: 900 ! important;
 }
 
@@ -35,9 +38,9 @@
 }
 
 #jdocmanual-main {
-	height: 70vh;
+	/*height: 70vh;
 	overflow-y: auto;
-	min-height: 70vh;
+	min-height: 70vh;*/
 }
 
 #document-panel {
@@ -74,17 +77,21 @@
 	box-sizing: border-box;
 	font-size: 14px;
 	line-height: 1.5;
-	height: 70vh;
+	height: 100vh;
 	position: sticky;
 	top: 0;
 	right: 0;
 	z-index: 2;
 	overflow-y: auto;
-	padding-left: 1rem;
+	padding-left: 0.5rem;
 }
 
 .accordion-button {
-	padding: 0.5rem 1rem ! important;
+	padding: 0.5rem 0.5rem ! important;
+}
+
+.accordion-button.collapsed, .accordion-button:not(.collapsed) {
+	background-color: #eaf0f8 !important;
 }
 
 .jdocmanual-accordion-body {
@@ -124,8 +131,14 @@ div#toc-panel ul {
 	padding-left: 0.5rem;
 }
 
-#jdocmanual-original {
-	position: absolute;
-	top: 0;
-	right: 0;
+.jdocmanual-container {
+	background-color: #fff;
+}
+
+.container-banner {
+	margin: 0 !important;
+}
+
+.btn-toolbar {
+	margin-bottom: 1rem;
 }

@@ -34,46 +34,58 @@ class IndexController extends BaseController
 	 */
 	public function fetch()
 	{
-		$app = Factory::getApplication();
+		$jform = $this->app->input->get('jform', array(), 'array');
+		$manual_id = $jform['manual_id'];
+		$index_language_code = $jform['index_language_code'];
+
+		$this->app->enqueueMessage('Index updated for manual #' . $manual_id . ' in ' . $index_language_code, 'warning');
+
 		$db = Factory::getDbo();
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 
-		// need parameters for fetch
-		$params = ComponentHelper::getParams('com_jdocmanual');
+		// Get url from the sources table
+		$query = $db->getQuery(true);
+		$query->select('index_url')
+		->from('#__jdocmanual_sources')
+		->where('id = :id' )
+		->bind(':id', $manual_id);
+		$db->setQuery($query);
+		$url = $db->loadResult();
 
-		$active_manual = $app->getUserState('com_jdocmanual.active_manual');
-		if (empty($active_manual))
+		// Check if pages are being delivered by a proxy
+		$proxy = true;
+		if (strpos($url, '/proxy/') === false)
 		{
-			$active_manual = $params->get('default_manual');
+			$proxy = false;
 		}
-		$url = $params->get('manual' . $active_manual . '_url');
-		// For Joomla 3
-		//$url = 'https://help.joomla.org/J3.x:Doc_Pages';
-		$index_language = $this->app->getUserState('com_jdocmanual.index_language', 'en');
+
 
 		// if the language is not English add the language code
-		$lang = ($index_language == 'en' ? '' : '/' . $index_language);
+		$lang = ($index_language_code == 'en' ? '' : '/' . $index_language_code);
 
 		// if the page does not exist the first header will be 404
+		// suppress the error message
 		$content = @file_get_contents($url . $lang);
+
 		if (empty($content))
 		{
+			// suppress the error message
 			$content = @\file_get_contents($url);
 			if (empty($content))
 			{
-				$app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_FAIL'), 'warning');
+				$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_FAIL'), 'warning');
 				return false;
 			}
 			if ($lang != 'en')
 			{
-				$app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_ENGLISH'), 'warning');
+				$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_ENGLISH'), 'warning');
 				// check whether English content exists
 				$query = $db->getQuery(true);
 				$query->select('id')
 				->from('#__jdocmanual_menu')
-				->where('menu_key = :menu_key')
+				->where('source_id = :source_id')
 				->where('language_code = ' . $db->quote('en'))
-				->bind(':menu_key' , $url, ParameterType::STRING);
+				->bind(':source_id' , $manual_id);
 				$db->setQuery($query);
 				$fetched = $db->loadResult();
 				if ($fetched)
@@ -112,7 +124,23 @@ class IndexController extends BaseController
 					$id += 1;
 					foreach ($node->getElementsByTagName('a') as $child)
 					{
-						$html .= $this->accordion_item($child->getAttribute('href'), $child->nodeValue);
+						// if no proxy is in use the url is like this
+						// /Special:MyLanguage/Welcome OR
+						// /mw/index.php?title=Welcome
+
+						// if a proxy is in use the url is like this
+						// /proxy?keyref=Help40:Articles&lang=en OR
+						// /proxy/?page=Welcome
+						// And
+						// /mw/index.php?title=Welcome
+						// needs to be converted to
+						// /proxy/?page=Welcome
+						$href = $child->getAttribute('href');
+						if ($proxy)
+						{
+							$href = substr($href, (strpos($href, '=')+1));
+						}
+						$html .= $this->accordion_item($href, $child->nodeValue);
 					}
 					$html .= $this->accordion_end ();
 				}
@@ -124,10 +152,10 @@ class IndexController extends BaseController
 		$query = $db->getQuery(true);
 		$query->insert('#__jdocmanual_menu')
 		->set('language_code = :index_language')
-		->set('menu_key = :menu_key')
+		->set('source_id = :source_id')
 		->set('menu = :menu')
-		->bind(':index_language', $index_language, ParameterType::STRING)
-		->bind(':menu_key', $url, ParameterType::STRING)
+		->bind(':index_language', $index_language_code, ParameterType::STRING)
+		->bind(':source_id', $manual_id)
 		->bind(':menu', $html, ParameterType::STRING);
 		$db->setQuery($query);
 		$db->execute();

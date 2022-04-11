@@ -52,21 +52,48 @@ function eraseCookie(name) {
 }
 
 /**
+ * Select manual
+ */
+
+let manuals = document.getElementsByClassName('set-manual');
+
+let setManual = function() {
+  const regex = /.*button-(\d{1,}) .*/;
+  let className = this.className;
+  let manual_id = className.match(regex)[1];
+  let task = document.getElementById('task');
+  task.value = 'display.selectmanual';
+  let jform_manual = document.getElementById('jform_manual_id');
+  jform_manual.value = manual_id;
+  let form = document.getElementById('adminForm');
+  form.submit();
+}
+
+for (let i = 0; i < manuals.length; i += 1) {
+  manuals[i].addEventListener('click', setManual, false);
+}
+
+/**
  * Select index language or content language
  */
 
 let languages = document.getElementsByClassName('set-language');
 
 let setLanguage = function() {
-  let language_code = this.innerText;
+  const regex = /.*button-([a-z]{1,2}) .*/;
+  let className = this.className;
+  let language_code = className.match(regex)[1];
   let task = document.getElementById('task');
+
+  let jform_index_language_code = document.getElementById('jform_index_language_code');
+  let jform_page_language_code = document.getElementById('jform_page_language_code');
   if (this.classList.contains('index')) {
-    task.value = 'content.selectindexlanguage';
+    jform_index_language_code.value = language_code;
+    task.value = 'display.selectindexlanguage';
   } else {
-    task.value = 'content.selectlanguage';
+    jform_page_language_code.value = language_code;
+    task.value = 'display.selectpagelanguage';
   }
-  let jform_language = document.getElementById('jform_language');
-  jform_language.value = language_code;
   let form = document.getElementById('adminForm');
   form.submit();
 };
@@ -99,7 +126,7 @@ if(toggle) {
 function scrolltoheading() {
   document.querySelectorAll("#scroll-panel h2, #scroll-panel h3")[this.getAttribute('data-index')].scrollIntoView(
   {
-    behavior: 'smooth', block: 'start'
+    behavior: 'smooth', block: 'center'
   });
 }
 
@@ -126,17 +153,27 @@ async function setPanelContent(itemId, title) {
     return;
   }
   let document_panel = document.getElementById('document-panel');
-  let main_panel = document.getElementById('jdocmanual-main');
-  let jdocmanual_original = document.getElementById('jdocmanual-original');
+  //let main_panel = document.getElementById('jdocmanual-main');
+  let jdocmanual_original = document.getElementById('select-actions-children-preview');
+  let page_path = document.getElementById('jform_page_path');
+  page_path.value = itemId;
 
   setCookie('jdocmanualItemId', itemId, 10);
   setCookie('jdocmanualTitle', title, 10);
 
   // get token from javascript loaded in the page
   const token = Joomla.getOptions('csrf.token', '');
+  let manualId = document.getElementById('jform_manual_id').value;
+  let lang = '';
+  let jform_page_language_code = document.getElementById('jform_page_language_code');
+  if (jform_page_language_code && jform_page_language_code.value !== 'en') {
+    lang = jform_page_language_code.value;
+  }
   let url = 'index.php?option=com_jdocmanual&task=content.fillpanel';
   let data = new URLSearchParams();
-  data.append('itemId', itemId);
+  data.append('manual_id', manualId);
+  data.append('item_id', itemId);
+  data.append('page_language_code', lang);
   data.append(token, 1);
   const options = {
     body: data,
@@ -152,14 +189,17 @@ async function setPanelContent(itemId, title) {
     document_title.innerText = title;
     document_panel.innerHTML = result;
 
-    // create the link for the Original button and show it
-    let lang = '';
-    if (jdocmanual_active_language && jdocmanual_active_language !== 'en') {
-      lang = '/' + jdocmanual_active_language;
-    }
     // jdocmanual_active_url is javascript in the page at load time
-    jdocmanual_original.href = jdocmanual_active_url + itemId + lang;
-    jdocmanual_original.classList.remove('d-none');
+    if (jdocmanual_original) {
+      // create the link for the Original button and show it
+      if (jform_page_language_code && jform_page_language_code.value !== 'en') {
+        lang = '/' + jform_page_language_code.value;
+      }
+      let source_url = document.getElementById('jform_index_url').value;
+      source_url = source_url.substring(0, source_url.lastIndexOf('/') + 1);
+      jdocmanual_original.href = source_url + itemId + lang;
+      jdocmanual_original.classList.remove('d-none');
+    }
 
     // create the Table of Contents
     if(document.querySelectorAll("#scroll-panel h2, #scroll-panel h3").length > 0) {

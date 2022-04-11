@@ -33,40 +33,19 @@ class DisplayController extends BaseController
 
 	protected $app;
 
-	/**
-	 * Method to get a reference to the current view and load it if necessary.
-	 *
-	 * @param   string  $name    The view name. Optional, defaults to the controller name.
-	 * @param   string  $type    The view type. Optional.
-	 * @param   string  $prefix  The class prefix. Optional.
-	 * @param   array   $config  Configuration array for view. Optional.
-	 *
-	 * @return  \Joomla\CMS\MVC\View\AbstractView  Reference to the view or an error.
-	 *
-	 * @since   3.0
-	 * @throws  \Exception
-	 */
-	public function getView($name = '', $type = '', $prefix = '', $config = [])
+	public function selectmanual()
 	{
-		// Force to load the admin view
-		return parent::getView($name, $type, 'Administrator', $config);
+		return parent::display();
 	}
 
-	/**
-	 * Method to get a model object, loading it if required.
-	 *
-	 * @param   string  $name    The model name. Optional.
-	 * @param   string  $prefix  The class prefix. Optional.
-	 * @param   array   $config  Configuration array for model. Optional.
-	 *
-	 * @return  \Joomla\CMS\MVC\Model\BaseDatabaseModel|boolean  Model object on success; otherwise false on failure.
-	 *
-	 * @since   3.0
-	 */
-	public function getModel($name = '', $prefix = '', $config = [])
+	public function selectindexlanguage()
 	{
-		// Force to load the admin model
-		return parent::getModel($name, 'Administrator', $config);
+		return parent::display();
+	}
+
+	public function selectpagelanguage()
+	{
+		return parent::display();
 	}
 
 	/**
@@ -74,6 +53,7 @@ class DisplayController extends BaseController
 	 */
 	public function fetchcontents()
 	{
+		$this->app->enqueueMessage('Controller: Test in DisplayController', 'warning');
 		if (!Session::checkToken('post'))
 		{
 			$this->app->enqueueMessage('Controller: Invalid Token!', 'warning');

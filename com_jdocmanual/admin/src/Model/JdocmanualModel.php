@@ -28,53 +28,81 @@ class JdocmanualModel extends ListModel
 	{
 	}
 
-	public function getMenu()
+	/**
+	 * Populate the index of pages that appears in the left column
+	 *
+	 * @return string html created by Fetch index
+	 */
+	public function getMenu($manual_id, $index_language_code)
 	{
-		$app = Factory::getApplication();
-		$active_manual = $app->getUserState('com_jdocmanual.active_manual');
-		$params = ComponentHelper::getParams('com_jdocmanual');
-		if (empty($active_manual))
-		{
-			// need parameters for fetch
-			$active_manual = $params->get('default_manual');
-			$app->setUserState('com_jdocmanual.active_manual', $active_manual);
-		}
-		$url = $params->get('manual' . $active_manual . '_url');
+		//$app = Factory::getApplication();
 
-		$index_language = $app->getUserState('com_jdocmanual.index_language');
-		if (empty($index_language))
-		{
-			$index_language = 'en';
-			$app->setUserState('com_jdocmanual.index_language', $index_language);
-		}
 		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 		$query->select('menu')
 		->from('#__jdocmanual_menu')
 		->where('state = 1')
-		->where('menu_key = :menu_key')
+		->where('source_id = :source_id')
 		->where('language_code = :language_code')
-		->bind(':menu_key', $url, ParameterType::STRING)
-		->bind(':language_code', $index_language, ParameterType::STRING)
+		->bind(':source_id', $manual_id, ParameterType::INTEGER)
+		->bind(':language_code', $index_language_code, ParameterType::STRING)
 		->order('id desc');
-		//var_dump($url, $index_language, $query->__tostring());die;
+		//var_dump($index_language, $query->__tostring());die;
 		$db->setQuery($query);
 		$menu = $db->loadObject();
-		if (empty($menu && $index_language != 'en'))
+		//var_dump($menu);die;
+		if (empty($menu && $index_language_code != 'en'))
 		{
 			// try again with English
 			$query = $db->getQuery(true);
 			$query->select('menu')
 			->from('#__jdocmanual_menu')
 			->where('state = 1')
-			->where('menu_key = :menu_key')
+			->where('source_id = :source_id')
 			->where('language_code = ' . $db->quote('en'))
-			->bind(':menu_key', $url, ParameterType::STRING)
+			->bind(':source_id', $manual_id, ParameterType::INTEGER)
 			->order('id desc');
-			//var_dump($url, $index_language, $query->__tostring());die;
+			//var_dump($index_language, $query->__tostring());die;
 			$db->setQuery($query);
 			$menu = $db->loadObject();
 		}
+		//var_dump($menu);die;
 		return $menu;
+	}
+
+	public function getManuals()
+	{
+		$db = Factory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('*')
+		->from('#__jdocmanual_sources')
+		->where('state = 1')
+		->order('id');
+		$db->setQuery($query);
+		return $db->loadObjectList();
+	}
+
+	public function getLanguages($which)
+	{
+		$db = Factory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('id, code, title')
+		->from('#__jdocmanual_languages')
+		->where('state = 1')
+		->where($which . '_language = 1')
+		->order('code');
+		$db->setQuery($query);
+		return $db->loadObjectList();
+	}
+
+	public function getSourceData($id)
+	{
+		$db = Factory::getDbo();
+		$query = $db->getQuery(true);
+		$query->select('title, page_url, index_url')
+		->from('#__jdocmanual_sources')
+		->where('id = ' . $id);
+		$db->setQuery($query);
+		return $db->loadObject();
 	}
 }
