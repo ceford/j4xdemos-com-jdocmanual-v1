@@ -120,13 +120,13 @@ class HtmlView extends BaseHtmlView
 		foreach ($this->index_languages as $language)
 		{
 			$icon = '';
-			if ($this->page_language_code == $language->code)
+			if ($this->index_language_code == $language->code)
 			{
 				$icon = 'icon-check';
 			}
 			$childBar->standardButton($language->code)
 			->text($language->title)
-			->buttonClass('set-language border-bottom')
+			->buttonClass('set-language index border-bottom')
 			->task('jdocmanual.default')
 			->icon($icon);
 		}
@@ -148,7 +148,7 @@ class HtmlView extends BaseHtmlView
 			}
 			$childBar->standardButton($language->code)
 			->text($language->title)
-			->buttonClass('set-language index border-bottom')
+			->buttonClass('set-language border-bottom')
 			->task('jdocmanual.default')
 			->icon($icon);
 		}

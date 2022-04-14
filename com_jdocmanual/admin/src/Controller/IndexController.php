@@ -13,6 +13,7 @@ namespace J4xdemos\Component\Jdocmanual\Administrator\Controller;
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Installer\InstallerHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\Database\ParameterType;
@@ -64,13 +65,14 @@ class IndexController extends BaseController
 		$lang = ($index_language_code == 'en' ? '' : '/' . $index_language_code);
 
 		// if the page does not exist the first header will be 404
-		// suppress the error message
+		$local = InstallerHelper::downloadPackage($url . $lang);
+
 		$content = @file_get_contents($url . $lang);
 
-		if (empty($content))
+		if (empty($local))
 		{
 			// suppress the error message
-			$content = @\file_get_contents($url);
+			$local = InstallerHelper::downloadPackage($url);
 			if (empty($content))
 			{
 				$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_FAIL'), 'warning');
@@ -94,6 +96,9 @@ class IndexController extends BaseController
 				}
 			}
 		}
+
+		$content = file_get_contents(JPATH_SITE . '/tmp/' . $local);
+		@unlink(JPATH_SITE . '/tmp/' . $local);
 
 		$dom = new \DOMDocument;
 

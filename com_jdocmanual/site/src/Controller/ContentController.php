@@ -31,8 +31,8 @@ class ContentController extends AdmincontentController
 	protected $app;
 	protected $update = false;
 
-	public function fillpanel()
-	{
-		$this->fill();
-	}
+	//public function fillpanel()
+	//{
+	//	$this->fill();
+	//}
 }

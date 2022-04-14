@@ -13,6 +13,7 @@ namespace J4xdemos\Component\Jdocmanual\Administrator\Controller;
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Installer\InstallerHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\Database\ParameterType;
@@ -28,7 +29,12 @@ use Joomla\CMS\Uri\Uri;
 class ContentController extends BaseController
 {
 	protected $app;
+	protected $manual_id;
+	protected $item_id;
+	protected $page_language_code;
+	protected $index_language_code;
 	protected $update = false;
+	protected $lang_unavailable = false;
 
 	protected function setjdocmanualcookie($name, $value, $days)
 	{
@@ -48,6 +54,12 @@ class ContentController extends BaseController
 
 	public function update()
 	{
+		// data for update is in the form
+		$jform = $this->app->input->get('jform', array(), 'array');
+		$this->manual_id = $jform['manual_id'];
+		$this->item_id = $jform['page_path'];
+		$this->index_language_code = $jform['index_language_code'];
+		$this->page_language_code = $jform['page_language_code'];
 		$this->update = true;
 		$this->fill();
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
@@ -55,6 +67,7 @@ class ContentController extends BaseController
 
 	public function fillpanel()
 	{
+		// data for the page comes from the request
 		if (!Session::checkToken('post'))
 		{
 			// if the session has expired a login form will appear
@@ -62,33 +75,37 @@ class ContentController extends BaseController
 			$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 			return;
 		}
-		//$this->setjdocmanualcookie('jdocmanualReset', '', 0);
+		$this->manual_id = $this->app->input->get('manual_id', 0, 'int');
+		$this->item_id = $this->app->input->get('item_id', '', 'string');
+		$page_language_code = $this->app->input->get('page_language_code', '', 'string');
+		$this->page_language_code = empty($page_language_code) ? 'en' : $page_language_code;
 		$this->fill();
+	}
+
+	protected function get_localpage($item_id, $page_language_code)
+	{
+		$db = Factory::getDbo();
+		// is the required page already downloaded?
+		$query = $db->getQuery(true);
+
+		$query->select('jp.jdoc_key, jp.content')
+		->from('#__jdocmanual_pages AS jp')
+		->where('jp.jdoc_key = :itemId')
+		->where('jp.language_code = :page_language_code')
+		->bind(':itemId', $item_id, ParameterType::STRING)
+		->bind(':page_language_code', $page_language_code, ParameterType::STRING);
+		$db->setQuery($query);
+		return $db->loadObject();
 	}
 
 	protected function fill()
 	{
+
 		$db = Factory::getDbo();
-
-		$manual_id = $this->app->input->get('manual_id', 0, 'int');
-		$item_id = $this->app->input->get('item_id', '', 'string');
-		$page_language_code = $this->app->input->get('page_language_code', '', 'string');
-
-		$page_language_code = empty($page_language_code) ? 'en' : $page_language_code;
 
 		if ($this->update !== true)
 		{
-			// is the required page already downloaded?
-			$query = $db->getQuery(true);
-
-			$query->select('jp.jdoc_key, jp.content')
-			->from('#__jdocmanual_pages AS jp')
-			->where('jp.jdoc_key = :itemId')
-			->where('jp.language_code = :page_language_code')
-			->bind(':itemId', $item_id, ParameterType::STRING)
-			->bind(':page_language_code', $page_language_code, ParameterType::STRING);
-			$db->setQuery($query);
-			$row = $db->loadObject();
+			$row = $this->get_localpage($this->item_id, $this->page_language_code);
 
 			// if content is not empty echo and exit
 			if (!empty($row->content))
@@ -103,7 +120,7 @@ class ContentController extends BaseController
 		$query->select('index_url')
 		->from('#__jdocmanual_sources')
 		->where('id = :id')
-		->bind(':id', $manual_id);
+		->bind(':id', $this->manual_id);
 		$db->setQuery($query);
 		$url = $db->loadResult();
 
@@ -119,22 +136,37 @@ class ContentController extends BaseController
 		}
 
 		// if the language is not English add the language code
-		$lang = ($page_language_code == 'en' ? '' : '/' . $page_language_code);
-		$lang_unavailable = false;
+		$lang = ($this->page_language_code == 'en' ? '' : '/' . $this->page_language_code);
 
 		// if the page does not exist the first header will be 404
+		$local = InstallerHelper::downloadPackage($url . $this->item_id . $lang);
 
-		$content = @file_get_contents($url . $item_id . $lang);
-		if (empty($content))
+		if (empty($local))
 		{
-			$content = file_get_contents($url . $item_id);
-			if (empty($content))
+			// the page did not exist - is it already downloaded in English
+			$this->lang_unavailable = true;
+			$row = $this->get_localpage($this->item_id, 'en');
+			if (!empty($row->content))
 			{
+				$this->send_template($row->content);
+			}
+
+			// otherwise get the English contents
+			$local = InstallerHelper::downloadPackage($url . $this->item_id);
+
+			$this->page_language_code = 'en';
+
+			if (empty($local))
+			{
+				var_dump($this->manual_id, $row);
+				echo 'Debug: ' . $url . $this->item_id . '<br />';
 				echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL');
 				jexit();
 			}
-			$lang_unavailable = true;
 		}
+		$content = file_get_contents(JPATH_SITE . '/tmp/' . $local);
+		@unlink(JPATH_SITE . '/tmp/' . $local);
+
 		$dom = new \DOMDocument;
 
 		libxml_use_internal_errors(true);
@@ -229,27 +261,19 @@ class ContentController extends BaseController
 		$replace = '/class="alert alert-info" role="alert"/';
 		$content = preg_replace($pattern, $replace, $content);
 
-		if ($lang_unavailable)
-		{
-			$mod = '<div class="alert alert-info">';
-			$mod .= Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL_LANGUAGE');
-			$mod .= "</div>\n";
-			$content =  $mod . $content;
-		}
-
 		// and store it locally
 		$query = $db->getQuery(true);
 		if ($this->update)
 		{
 			$query->update('#__jdocmanual_pages')
 			->where('jdoc_key = :id')
-			->bind(':id', $item_id);
+			->bind(':id', $this->item_id);
 		} else {
 			$query->insert('#__jdocmanual_pages')
 			->set('jdoc_key = :id')
-			->bind(':id', $item_id);
+			->bind(':id', $this->item_id);
 		}
-		$query->set('language_code = ' . $db->quote($page_language_code))
+		$query->set('language_code = ' . $db->quote($this->page_language_code))
 		->set('content = ' . $db->quote($content));
 		$db->setQuery($query);
 		$db->execute();
@@ -258,7 +282,23 @@ class ContentController extends BaseController
 
 	protected function send_template($content)
 	{
+		if ($this->lang_unavailable)
+		{
+			$mod = '<div class="alert alert-info">';
+			$mod .= Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL_LANGUAGE');
+			$mod .= "</div>\n";
+			$content =  $mod . $content;
+		}
+
 		echo '<div id="scroll-panel">';
+		if ($this->update)
+		{
+			$mod = '<div class="alert alert-info">';
+			$mod .= Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL_LANGUAGE');
+			$mod .= "</div>\n";
+			$content =  $mod . $content;
+		}
+
 		echo $content;
 		echo '</div>';
 		if ($this->update)
