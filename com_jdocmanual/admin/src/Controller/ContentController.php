@@ -54,6 +54,14 @@ class ContentController extends BaseController
 
 	public function update()
 	{
+		// data for the page comes from the request
+		if (!Session::checkToken('post'))
+		{
+			// if the session has expired a login form will appear
+			// but the token will be invalid so redirect to jdocmanual page
+			$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
+			return;
+		}
 		// data for update is in the form
 		$jform = $this->app->input->get('jform', array(), 'array');
 		$this->manual_id = $jform['manual_id'];
@@ -67,14 +75,6 @@ class ContentController extends BaseController
 
 	public function fillpanel()
 	{
-		// data for the page comes from the request
-		if (!Session::checkToken('post'))
-		{
-			// if the session has expired a login form will appear
-			// but the token will be invalid so redirect to jdocmanual page
-			$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
-			return;
-		}
 		$this->manual_id = $this->app->input->get('manual_id', 0, 'int');
 		$this->item_id = $this->app->input->get('item_id', '', 'string');
 		$page_language_code = $this->app->input->get('page_language_code', '', 'string');
