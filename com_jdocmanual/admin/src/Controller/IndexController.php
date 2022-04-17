@@ -39,8 +39,6 @@ class IndexController extends BaseController
 		$manual_id = $jform['manual_id'];
 		$index_language_code = $jform['index_language_code'];
 
-		$this->app->enqueueMessage('Index updated for manual #' . $manual_id . ' in ' . $index_language_code, 'warning');
-
 		$db = Factory::getDbo();
 		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 
@@ -67,20 +65,10 @@ class IndexController extends BaseController
 		// if the page does not exist the first header will be 404
 		$local = InstallerHelper::downloadPackage($url . $lang);
 
-		$content = @file_get_contents($url . $lang);
-
 		if (empty($local))
 		{
-			// suppress the error message
-			$local = InstallerHelper::downloadPackage($url);
-			if (empty($content))
-			{
-				$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_FAIL'), 'warning');
-				return false;
-			}
 			if ($lang != 'en')
 			{
-				$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_ENGLISH'), 'warning');
 				// check whether English content exists
 				$query = $db->getQuery(true);
 				$query->select('id')
@@ -92,8 +80,16 @@ class IndexController extends BaseController
 				$fetched = $db->loadResult();
 				if ($fetched)
 				{
+					$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_ENGLISH'), 'warning');
 					return false;
 				}
+			}
+			// fetch the index in English
+			$local = InstallerHelper::downloadPackage($url);
+			if (empty($local))
+			{
+				$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_INDEX_FAIL'), 'warning');
+				return false;
 			}
 		}
 
@@ -164,6 +160,7 @@ class IndexController extends BaseController
 		->bind(':menu', $html, ParameterType::STRING);
 		$db->setQuery($query);
 		$db->execute();
+		$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_SUCCESS'), 'success');
 	}
 
 	protected function accordion_start ($id, $label)
