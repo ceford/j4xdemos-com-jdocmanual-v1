@@ -110,9 +110,37 @@ class IndexController extends BaseController
 		$node = $newdom->importNode($node, true);
 		$newdom->documentElement->appendChild($node);
 
-		$id = 1;
+		$id = 0;
 		$html = '<div class="accordion" id="accordionJdoc">';
 
+		// to use h3 plus single level ul
+		foreach($newdom->getElementsByTagName('*') as $element) {
+			if ($element->nodeType === XML_ELEMENT_NODE)
+			{
+				if ($element->nodeName == 'h3')
+				{
+					// close the previous accordian
+					if ($id > 0)
+					{
+						$html .= $this->accordion_end ();
+					}
+					$id += 1;
+					// The title is in the first span
+					$child = $element->getElementsByTagName('span')[0];
+					// open a new accordian
+					$html .= $this->accordion_start ($id, $child->textContent);
+				}
+				if ($element->nodeName == 'li' && !empty($id))
+				{
+					$value = $element->nodeValue;
+					$lines = preg_split("/((\r?\n)|(\r\n?))/", $value);
+					$child = $element->getElementsByTagName('a')[0];
+					$href = $child->getAttribute('href');
+					$html .= $this->accordion_item($href, $child->nodeValue);
+				}
+			}
+		}
+		/*
 		foreach ($newdom->getElementsByTagName('ul')->item(0)->childNodes as $node)
 		{
 			if ($node->nodeType === XML_ELEMENT_NODE)
@@ -147,6 +175,7 @@ class IndexController extends BaseController
 				}
 			}
 		}
+		*/
 		$html .= "\n</div>\n";
 
 		// save the menu in the database
