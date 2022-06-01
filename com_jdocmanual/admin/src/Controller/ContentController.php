@@ -129,14 +129,15 @@ class ContentController extends BaseController
 		// keep everything up to the last /
 		$url = substr($url, 0, strrpos($url,'/')+1);
 
+		// if the language is not English add the language code
+		$lang = ($this->page_language_code == 'en' ? '' : '/' . $this->page_language_code);
+
 		// if the url contains proxy
 		if (strpos($url, 'proxy') !== false)
 		{
 			$url .= '?page=';
+			$lang = '&lang=' . $this->page_language_code;
 		}
-
-		// if the language is not English add the language code
-		$lang = ($this->page_language_code == 'en' ? '' : '/' . $this->page_language_code);
 
 		// if the page does not exist the first header will be 404
 		$local = InstallerHelper::downloadPackage($url . $this->item_id . $lang);
