@@ -34,7 +34,10 @@ class ContentController extends BaseController
 	protected $page_language_code;
 	protected $index_language_code;
 	protected $update = false;
+	protected $renew = true;
+	protected $page_updated;
 	protected $lang_unavailable = false;
+	protected $interval = 0;
 
 	protected function setjdocmanualcookie($name, $value, $days)
 	{
@@ -54,12 +57,12 @@ class ContentController extends BaseController
 
 	public function update()
 	{
+		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 		// data for the page comes from the request
 		if (!Session::checkToken('post'))
 		{
 			// if the session has expired a login form will appear
 			// but the token will be invalid so redirect to jdocmanual page
-			$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 			return;
 		}
 		// data for update is in the form
@@ -69,8 +72,8 @@ class ContentController extends BaseController
 		$this->index_language_code = $jform['index_language_code'];
 		$this->page_language_code = $jform['page_language_code'];
 		$this->update = true;
+		$this->renew = true;
 		$this->fill();
-		$this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=jdocmanual', false));
 	}
 
 	public function fillpanel()
@@ -88,20 +91,29 @@ class ContentController extends BaseController
 		// is the required page already downloaded?
 		$query = $db->getQuery(true);
 
-		$query->select('jp.jdoc_key, jp.content')
+		$query->select('jp.jdoc_key, jp.content, jp.last_update')
 		->from('#__jdocmanual_pages AS jp')
 		->where('jp.jdoc_key = :itemId')
 		->where('jp.language_code = :page_language_code')
 		->bind(':itemId', $item_id, ParameterType::STRING)
 		->bind(':page_language_code', $page_language_code, ParameterType::STRING);
 		$db->setQuery($query);
-		return $db->loadObject();
+		$row = $db->loadObject();
+		if (!empty($row))
+		{
+			// was the last update more than xxx ago
+			$now = date_create("now");
+			$last_update = date_create($row->last_update);
+			$this->interval = date_diff($last_update, $now)->d;
+		}
+		return $row;
 	}
 
 	protected function fill()
 	{
-
 		$db = Factory::getDbo();
+		$params = ComponentHelper::getParams('com_jdocmanual');
+		$update_period = $params->get('update_period');
 
 		if ($this->update !== true)
 		{
@@ -110,7 +122,14 @@ class ContentController extends BaseController
 			// if content is not empty echo and exit
 			if (!empty($row->content))
 			{
-				$this->send_template($row->content);
+				if ($this->interval < $update_period)
+				{
+					$this->send_template($row->content);
+				}
+				else
+				{
+					$this->renew = true;
+				}
 			}
 		}
 
@@ -139,27 +158,33 @@ class ContentController extends BaseController
 			$lang = '&lang=' . $this->page_language_code;
 		}
 
+		//echo $this->app->enqueueMessage('Test= ' . $url . $this->item_id . $lang);
 		// if the page does not exist the first header will be 404
 		$local = InstallerHelper::downloadPackage($url . $this->item_id . $lang);
 
 		if (empty($local))
 		{
-			// the page did not exist - is it already downloaded in English
+			// The page did not exist - clear the message queue
+			$this->app->getMessageQueue(true);
+
+			// Is it already downloaded in English
 			$this->lang_unavailable = true;
 			$row = $this->get_localpage($this->item_id, 'en');
 			if (!empty($row->content))
 			{
-				$this->send_template($row->content);
+				if ($this->interval < $update_period)
+				{
+					$this->send_template($row->content);
+				}
 			}
 
-			// otherwise get the English contents
+			// Get the English contents
 			$local = InstallerHelper::downloadPackage($url . $this->item_id);
 
 			$this->page_language_code = 'en';
 
 			if (empty($local))
 			{
-				var_dump($this->manual_id, $row);
 				echo 'Debug: ' . $url . $this->item_id . '<br />';
 				echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL');
 				jexit();
@@ -268,47 +293,54 @@ class ContentController extends BaseController
 
 		// and store it locally
 		$query = $db->getQuery(true);
-		if ($this->update)
+		if ($this->renew)
 		{
 			$query->update('#__jdocmanual_pages')
 			->where('jdoc_key = :id')
-			->bind(':id', $this->item_id);
+			->where('language_code = :language_code')
+			->bind(':id', $this->item_id)
+			->bind(':language_code', $this->page_language_code);
 		} else {
 			$query->insert('#__jdocmanual_pages')
 			->set('jdoc_key = :id')
 			->bind(':id', $this->item_id);
 		}
 		$query->set('language_code = ' . $db->quote($this->page_language_code))
-		->set('content = ' . $db->quote($content));
+		->set('content = ' . $db->quote($content))
+		->set('last_update = NOW()');
 		$db->setQuery($query);
 		$db->execute();
+		$this->page_updated = true;
 		$this->send_template($content);
 	}
 
 	protected function send_template($content)
 	{
+		// add some messages before content
+		$mod = '';
+
 		if ($this->lang_unavailable)
 		{
 			$mod = '<div class="alert alert-info">';
 			$mod .= Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL_LANGUAGE');
 			$mod .= "</div>\n";
-			$content =  $mod . $content;
+		}
+
+		if ($this->page_updated)
+		{
+			$mod = '<div class="alert alert-info">';
+			$mod .= Text::_('COM_JDOCMANUAL_JDOCMANUAL_UPDATE_PAGE_SUCCESS');
+			$mod .= "</div>\n";
 		}
 
 		echo '<div id="scroll-panel">';
-		if ($this->update)
-		{
-			$mod = '<div class="alert alert-info">';
-			$mod .= Text::_('COM_JDOCMANUAL_JDOCMANUAL_FETCH_PAGE_FAIL_LANGUAGE');
-			$mod .= "</div>\n";
-			$content =  $mod . $content;
-		}
 
-		echo $content;
+		echo $mod . $content;
+
 		echo '</div>';
+
 		if ($this->update)
 		{
-			$this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_JDOCMANUAL_UPDATE_PAGE_SUCCESS'), 'success');
 			return;
 		}
 		exit;
