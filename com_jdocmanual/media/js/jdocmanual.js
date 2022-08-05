@@ -154,6 +154,11 @@ async function setPanelContent(itemId, title) {
   }
   let document_panel = document.getElementById('document-panel');
   //let main_panel = document.getElementById('jdocmanual-main');
+  document_panel.innerHTML = `<div class="text-center">
+    <div class="spinner-border m-5" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>`;
   let jdocmanual_original = document.getElementById('select-actions-children-preview');
   let page_path = document.getElementById('jform_page_path');
   page_path.value = itemId;

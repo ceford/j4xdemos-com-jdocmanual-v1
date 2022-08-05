@@ -286,6 +286,10 @@ class ContentController extends BaseController
 		// changed to absolute links.
 		$content = preg_replace('/href="/', 'target="_blank" href="' . substr($url, 0, -1), $content);
 
+		// but external links in the original are now corrpted. E.g.
+		// https://docs.joomla.orghttps//www.apachefriends.org/index.html
+		$content = preg_replace('/https:\/\/docs.joomla.orghttps/', 'https', $content);
+
 		// or remove links - this seems a better practical solution
 		/*$pattern = '/<a .*?>(.*?)<\/a>/';*/
 		//$content = preg_replace($pattern, '<u>$1</u>', $content);
@@ -347,6 +351,6 @@ class ContentController extends BaseController
 		{
 			return;
 		}
-		exit;
+		jexit();
 	}
 }
