@@ -5,7 +5,7 @@
         <description><![CDATA[Display Joomla documentation from the Joomla Docs site]]></description>
         <element>com_jdocmanual</element>
         <type>component</type>
-        <version>0.6.1</version>
+        <version>0.6.2</version>
         <client>administrator</client>
         <infourl title="JDOC Manual Extension">https://github.com/ceford/j4xdemos-com-jdocmanual/blob/master/README.md</infourl>
         <downloads>

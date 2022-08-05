@@ -278,13 +278,17 @@ class ContentController extends BaseController
 		$replace =  '';
 		$content = \preg_replace($pattern, $replace, $content);
 
+		// remove links from around images
+		$pattern = '/<a href="\/File:.*?>.*?(<img .*>).*?<\/a>/';
+		$content = preg_replace($pattern, '<u>$1</u>', $content);
+
 		// links are to the local site - so if left in they must be
 		// changed to absolute links.
-		//$content = preg_replace('/href="/', 'target="_blank" href="' . substr($url, 0, -1), $content);
+		$content = preg_replace('/href="/', 'target="_blank" href="' . substr($url, 0, -1), $content);
 
-		// or remove links - this seems a better prctical solution
-		$pattern = '/<a .*?>(.*?)<\/a>/';
-		$content = preg_replace($pattern, '<u>$1</u>', $content);
+		// or remove links - this seems a better practical solution
+		/*$pattern = '/<a .*?>(.*?)<\/a>/';*/
+		//$content = preg_replace($pattern, '<u>$1</u>', $content);
 
 		// change class="alert-box" to class="alert alert-info" role="alert"
 		$pattern = '/class="alert-box"/';
