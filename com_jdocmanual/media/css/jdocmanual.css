@@ -54,9 +54,33 @@
 }
 
 #document-panel img {
-	display: block;
+	display: inline-block;
 	max-width: 100%;
 	height: auto;
+}
+
+.panel {
+	padding: .5em;
+	overflow: hidden;
+}
+p.ambox {
+	margin: .5em 0 0 0;
+}
+.panel.ambox-tip {
+	background-color: #bad0e3;
+	border-color: #bad0e3;
+}
+
+.panel.ambox-serious {
+	background-color: #FFBABA;
+	border-color: #FFBABA;
+}
+
+.ambox-title {
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 1.2;
+	margin-left: .25em;
 }
 
 #document-title {

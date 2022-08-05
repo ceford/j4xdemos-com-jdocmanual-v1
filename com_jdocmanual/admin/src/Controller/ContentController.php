@@ -246,6 +246,11 @@ class ContentController extends BaseController
 		{
 			$e->parentNode->removeChild($e);
 		}
+		// remove the version div
+		foreach($xpath->query('//div[contains(attribute::class, "metadata")]') as $e )
+		{
+			$e->parentNode->removeChild($e);
+		}
 		// the [Edit] after a title
 		foreach($xpath->query('//span[contains(attribute::class, "mw-editsection")]') as $e )
 		{
@@ -279,8 +284,8 @@ class ContentController extends BaseController
 		$content = \preg_replace($pattern, $replace, $content);
 
 		// remove links from around images
-		$pattern = '/<a href="\/File:.*?>.*?(<img .*>).*?<\/a>/';
-		$content = preg_replace($pattern, '<u>$1</u>', $content);
+		$pattern = '/<a .*?href="\/File:.*?>.*?(<img .*?>).*?<\/a>/';
+		$content = preg_replace($pattern, '$1', $content);
 
 		// links are to the local site - so if left in they must be
 		// changed to absolute links.
