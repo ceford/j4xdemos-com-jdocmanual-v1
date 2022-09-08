@@ -51,4 +51,13 @@ HTMLHelper::_('bootstrap.collapse');
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>
 
-<?php include 'site-layout.php'; ?>
+<?php if (empty($this->menu)) : ?>
+	<?php
+		echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FIRST_FETCH_INDEX');
+	?>
+<?php else : ?>
+	<h2><?php echo $this->source->title; ?></h2>
+
+	<?php include 'site-layout.php'; ?>
+<?php endif; ?>
+

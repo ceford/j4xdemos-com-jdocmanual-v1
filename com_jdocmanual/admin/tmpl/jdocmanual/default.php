@@ -18,6 +18,7 @@ use Joomla\CMS\Router\Route;
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useStyle('com_jdocmanual.jdocmanual')
+->useStyle('com_jdocmanual.offcanvas')
 ->useScript('com_jdocmanual.jdocmanual');
 
 // make the toolbar not sticky
@@ -48,32 +49,10 @@ if (strpos($url, '/proxy/') !== false)
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>
 
-	<?php if (empty($this->menu)) : ?>
-		<?php
+<?php if (empty($this->menu)) : ?>
+	<?php
 		echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FIRST_FETCH_INDEX');
-		?>
-	<?php else : ?>
-	<div class="row jdocmanual-container">
-		<div class="col-12 col-md-3 g-0">
-			<nav id="jdocmanual-wrapper" aria-label="JDOC Manual Menu" class="sidebar-menu">
-				<?php echo $this->menu->menu; ?>
-			</nav>
-		</div>
-		<div class="col-12 col-md-6">
-			<div class="document-title">
-			<h2 id="document-title">
-			<?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_DOCUMENT_TITLE'); ?>
-			</h2>
-			</div>
-
-			<div id="document-panel" class="" tabindex="0">
-				<?php echo Text::_('COM_JDOCMANUAL_JDOCMANUAL_FIRST_SELECT'); ?>
-			</div>
-		</div>
-
-		<div class="col-12 col-md-3 g-0 d-none d-md-block">
-			<div id="toc-panel"></div>
-		</div>
-	</div>
-	<?php endif; ?>
-
+	?>
+<?php else : ?>
+	<?php include JPATH_SITE . '/components/com_jdocmanual/tmpl/jdocmanual/site-layout.php'; ?>
+<?php endif; ?>

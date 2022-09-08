@@ -225,6 +225,28 @@ async function setPanelContent(itemId, title) {
   }
 }
 
+// the default index location - set on page load
+let indexLocation = 'oncanvas';
+
+function setIndexLocation () {
+  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  // if the width is less than 576 move the index off canvas
+  let offcanvasId = document.getElementById('offcanvasMenu');
+  let oncanvasId = document.getElementById('oncanvasMenu');
+  let jdocmanulId = document.getElementById('jdocmanual-wrapper');
+  if (vw < 576) {
+    if (indexLocation == 'oncanvas') {
+      offcanvasId.appendChild(jdocmanulId);
+      indexLocation = 'offcanvas';
+    }
+  } else {
+    if (indexLocation == 'offcanvas') {
+      oncanvasId.appendChild(jdocmanulId);
+      indexLocation = 'oncanvas';
+    }
+  }
+}
+
 /**
  * Set up after page load after change of Manual, etc
  */
@@ -262,4 +284,17 @@ document.addEventListener('DOMContentLoaded', function(event) {
     collapse = document.getElementById(lastHeading);
   }
   collapse && collapse.classList.add('show');
+
+  // get the viewport width
+  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  // if the width is less than 576 move the index off canvas
+  indexLocation = 'oncanvas';
+  if(vw < 576) {
+    let offcanvasId = document.getElementById('offcanvasMenu');
+    let oncanvasId = document.getElementById('jdocmanual-wrapper');
+    offcanvasId.appendChild(oncanvasId);
+    indexLocation = 'offcanvas';
+  }
+  window.addEventListener("resize", setIndexLocation);
 });
+

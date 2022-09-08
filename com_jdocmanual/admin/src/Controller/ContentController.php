@@ -34,7 +34,7 @@ class ContentController extends BaseController
 	protected $page_language_code;
 	protected $index_language_code;
 	protected $update = false;
-	protected $renew = true;
+	protected $renew = false;
 	protected $page_updated;
 	protected $lang_unavailable = false;
 	protected $interval = 0;
@@ -113,9 +113,9 @@ class ContentController extends BaseController
 	{
 		$db = Factory::getDbo();
 		$params = ComponentHelper::getParams('com_jdocmanual');
-		$update_period = $params->get('update_period');
+		$update_period = (int) $params->get('update_period');
 
-		if ($this->update !== true)
+		if ($this->update === false)
 		{
 			$row = $this->get_localpage($this->item_id, $this->page_language_code);
 

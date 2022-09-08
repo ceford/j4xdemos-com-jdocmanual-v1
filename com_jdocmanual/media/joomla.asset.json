@@ -20,6 +20,11 @@
       "name": "com_jdocmanual.jdocmanual",
       "type": "style",
       "uri": "com_jdocmanual/jdocmanual.css"
+    },
+    {
+      "name": "com_jdocmanual.offcanvas",
+      "type": "style",
+      "uri": "com_jdocmanual/offcanvas.css"
     }
   ]
 }
