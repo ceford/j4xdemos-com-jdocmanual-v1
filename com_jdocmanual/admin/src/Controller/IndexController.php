@@ -132,50 +132,12 @@ class IndexController extends BaseController
 				}
 				if ($element->nodeName == 'li' && !empty($id))
 				{
-					$value = $element->nodeValue;
-					$lines = preg_split("/((\r?\n)|(\r\n?))/", $value);
 					$child = $element->getElementsByTagName('a')[0];
 					$href = $child->getAttribute('href');
 					$html .= $this->accordion_item($href, $child->nodeValue);
 				}
 			}
 		}
-		/*
-		foreach ($newdom->getElementsByTagName('ul')->item(0)->childNodes as $node)
-		{
-			if ($node->nodeType === XML_ELEMENT_NODE)
-			{
-				if ($node->nodeName == 'li')
-				{
-					$value = $node->nodeValue;
-					$lines = preg_split("/((\r?\n)|(\r\n?))/", $value);
-					$html .= $this->accordion_start ($id, $lines[0]);
-					$id += 1;
-					foreach ($node->getElementsByTagName('a') as $child)
-					{
-						// if no proxy is in use the url is like this
-						// /Special:MyLanguage/Welcome OR
-						// /mw/index.php?title=Welcome
-
-						// if a proxy is in use the url is like this
-						// /proxy?keyref=Help40:Articles&lang=en OR
-						// /proxy/?page=Welcome
-						// And
-						// /mw/index.php?title=Welcome
-						// needs to be converted to
-						// /proxy/?page=Welcome
-						$href = $child->getAttribute('href');
-						if ($proxy)
-						{
-							$href = substr($href, (strpos($href, '=')+1));
-						}
-						$html .= $this->accordion_item($href, $child->nodeValue);
-					}
-					$html .= $this->accordion_end ();
-				}
-			}
-		}
-		*/
 		$html .= "\n</div>\n";
 
 		// save the menu in the database

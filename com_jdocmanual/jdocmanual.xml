@@ -62,7 +62,6 @@
 			-->
 			<menu
 				link="option=com_jdocmanual&amp;view=jdocmanual"
-				view="jdocmanual"
 				img="default"
 				alt="Jdocmanual/Manual"
 			>
@@ -70,7 +69,6 @@
 			</menu>
 			<menu
 				link="option=com_jdocmanual&amp;view=sources"
-				view="sources"
 				img="default"
 				alt="Jdocmanual/Sources"
 			>
@@ -78,7 +76,6 @@
 			</menu>
 			<menu
 				link="option=com_jdocmanual&amp;view=languages"
-				view="languages"
 				img="default"
 				alt="Jdocmanual/Languages"
 			>
