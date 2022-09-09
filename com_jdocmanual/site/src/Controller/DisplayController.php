@@ -33,6 +33,16 @@ class DisplayController extends BaseController
 
 	protected $app;
 
+	public function selectindexlanguage()
+	{
+		return parent::display();
+	}
+
+	public function selectpagelanguage()
+	{
+		return parent::display();
+	}
+
 	/**
 	 * Method to get a reference to the current view and load it if necessary.
 	 *

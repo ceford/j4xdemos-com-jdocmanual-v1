@@ -83,6 +83,7 @@ let setLanguage = function() {
   const regex = /.*button-([a-z]{1,2}) .*/;
   let className = this.className;
   let language_code = className.match(regex)[1];
+  // the tasks are set in the Toolbar buttons so not really needed here
   let task = document.getElementById('task');
 
   let jform_index_language_code = document.getElementById('jform_index_language_code');

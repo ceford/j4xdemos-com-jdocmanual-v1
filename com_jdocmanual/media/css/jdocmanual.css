@@ -101,6 +101,14 @@ p.ambox {
 	z-index: 1;
 }
 
+#index-panel {
+	position: sticky;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	overflow-y: auto;
+}
+
 @media (min-width: 576px) {
 	#index-panel {
 		width: 200px;
@@ -127,7 +135,6 @@ p.ambox {
 	#index-panel {
 		width: 250px;
 	}
-
 	#page-panel {
 		width: calc(100% - 500px);
 		max-width: calc(100% - 500px);

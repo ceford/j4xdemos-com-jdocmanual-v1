@@ -155,36 +155,16 @@ class HtmlView extends BaseHtmlView
 			->text($manual->title)
 			->buttonClass('set-manual')
 			->icon($icon)
-			->task('content.selectmanual');
+			->task('display.selectmanual');
 		}
 
 		$dropdown = $toolbar->dropdownButton('select-language')
-		->text('COM_JDOCMANUAL_JDOCMANUAL_LANGUAGE_SELECT')
+		->text('COM_JDOCMANUAL_JDOCMANUAL_INDEX_LANGUAGE')
 		->toggleSplit(false)
 		->icon('icon-language')
 		->buttonClass('btn btn-action');
 
 		$childBar = $dropdown->getChildToolbar();
-
-		$childBar->separatorButton('page')
-		->text('Content Language');
-
-		foreach ($this->page_languages as $language)
-		{
-			$icon = '';
-			if ($this->page_language_code == $language->code)
-			{
-				$icon = 'icon-check';
-			}
-			$childBar->standardButton($language->code)
-			->text($language->title)
-			->buttonClass('set-language')
-			->task('jdocmanual.default')
-			->icon($icon);
-		}
-
-		$childBar->separatorButton('index')
-		->text('Index Language');
 
 		foreach ($this->index_languages as $language)
 		{
@@ -196,7 +176,29 @@ class HtmlView extends BaseHtmlView
 			$childBar->standardButton($language->code)
 			->text($language->title)
 			->buttonClass('set-language index')
-			->task('jdocmanual.default')
+			->task('display.setindexlanguage')
+			->icon($icon);
+		}
+
+		$dropdown = $toolbar->dropdownButton('select-language')
+		->text('COM_JDOCMANUAL_JDOCMANUAL_PAGE_LANGUAGE')
+		->toggleSplit(false)
+		->icon('icon-language')
+		->buttonClass('btn btn-action');
+
+		$childBar = $dropdown->getChildToolbar();
+
+		foreach ($this->page_languages as $language)
+		{
+			$icon = '';
+			if ($this->page_language_code == $language->code)
+			{
+				$icon = 'icon-check';
+			}
+			$childBar->standardButton($language->code)
+			->text($language->title)
+			->buttonClass('set-language')
+			->task('display.selectpagelanguage')
 			->icon($icon);
 		}
 

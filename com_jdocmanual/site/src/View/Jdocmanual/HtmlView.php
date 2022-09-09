@@ -106,7 +106,7 @@ class HtmlView extends BaseHtmlView
 			->text($manual->title)
 			->buttonClass('set-manual border-bottom')
 			->icon($icon)
-			->task('content.selectmanual');
+			->task('display.selectmanual');
 		}
 
 		$dropdown = $toolbar->dropdownButton('select-language')
@@ -127,7 +127,7 @@ class HtmlView extends BaseHtmlView
 			$childBar->standardButton($language->code)
 			->text($language->title)
 			->buttonClass('set-language index border-bottom')
-			->task('jdocmanual.default')
+			->task('display.setindexlanguage')
 			->icon($icon);
 		}
 
@@ -149,7 +149,7 @@ class HtmlView extends BaseHtmlView
 			$childBar->standardButton($language->code)
 			->text($language->title)
 			->buttonClass('set-language border-bottom')
-			->task('jdocmanual.default')
+			->task('display.selectpagelanguage')
 			->icon($icon);
 		}
 
