@@ -133,8 +133,13 @@ class IndexController extends BaseController
 				if ($element->nodeName == 'li' && !empty($id))
 				{
 					$child = $element->getElementsByTagName('a')[0];
-					$href = $child->getAttribute('href');
-					$html .= $this->accordion_item($href, $child->nodeValue);
+					if (!empty($child))
+					{
+						$href = $child->getAttribute('href');
+						// if the url contains the domain, remove it
+						$path = parse_url($href, PHP_URL_PATH);
+						$html .= $this->accordion_item($path, $child->nodeValue);
+					}
 				}
 			}
 		}
@@ -176,6 +181,24 @@ EOF;
 	protected function accordion_item($link, $value)
 	{
 		$link = preg_replace('/\/Special:MyLanguage\//', '', $link);
+		// remove any leading '/'
+		if (strpos($link, '/') === 0)
+		{
+			$link = substr($link, 1);
+		}
+		// remove leading J4.x, J3.x or Main: from the value
+		if (strpos($value, 'J4.x ') === 0)
+		{
+			$value = substr($value, 5);
+		}
+		elseif (strpos($value, 'J3.x ') === 0)
+		{
+			$value = substr($value, 5);
+		}
+		elseif (strpos($value, 'Main: ') === 0)
+		{
+			$value = substr($value, 6);
+		}
 		$html ='<li><span class="icon-file-alt icon-fw icon-jdocmanual" aria-hidden="true"></span>';
 		$html .= '<a href="#" class="content-link" data-content-id="' . $link . '">';
 		$html .= $value . '</a></li>' . "\n";
