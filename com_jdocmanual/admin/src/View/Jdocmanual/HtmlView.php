@@ -217,7 +217,7 @@ class HtmlView extends BaseHtmlView
 		->icon('icon-new-tab')
 		->text('COM_JDOCMANUAL_JDOCMANUAL_ORIGINAL')
 		->url($this->source->index_url)
-		->attributes(['target' => '_new']);
+		->attributes(['target' => '_blank']);
 
 		$childBar->standardButton('update-page')
 		->text(Text::_('COM_JDOCMANUAL_JDOCMANUAL_UPDATE_PAGE'))

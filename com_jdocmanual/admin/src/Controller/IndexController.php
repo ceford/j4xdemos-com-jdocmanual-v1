@@ -143,7 +143,7 @@ class IndexController extends BaseController
 				}
 			}
 		}
-		$html .= "\n</div>\n";
+		$html .= "\n</ul>\n</div>\n</div>\n</div>\n</div>\n";
 
 		// save the menu in the database
 		$query = $db->getQuery(true);
