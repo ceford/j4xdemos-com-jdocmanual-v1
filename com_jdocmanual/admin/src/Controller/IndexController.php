@@ -199,6 +199,10 @@ EOF;
 		{
 			$value = substr($value, 6);
 		}
+		elseif (strpos($value, 'JDOC: ') === 0)
+		{
+			$value = substr($value, 6);
+		}
 		$html ='<li><span class="icon-file-alt icon-fw icon-jdocmanual" aria-hidden="true"></span>';
 		$html .= '<a href="#" class="content-link" data-content-id="' . $link . '">';
 		$html .= $value . '</a></li>' . "\n";

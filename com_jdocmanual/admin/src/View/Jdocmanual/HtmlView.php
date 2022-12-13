@@ -214,7 +214,7 @@ class HtmlView extends BaseHtmlView
 		$childBar->appendButton('Custom', $layout->render([]), 'toggle-joomla-menu');
 
 		$childBar->linkButton('preview')
-		->icon('icon-new-tab')
+		->icon('icon-file-alt')
 		->text('COM_JDOCMANUAL_JDOCMANUAL_ORIGINAL')
 		->url($this->source->index_url)
 		->attributes(['target' => '_blank']);
