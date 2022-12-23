@@ -138,6 +138,8 @@ class IndexController extends BaseController
 						$href = $child->getAttribute('href');
 						// if the url contains the domain, remove it
 						$path = parse_url($href, PHP_URL_PATH);
+						// if the path contains S:MyLanguage or Special:MyLanguage remove it
+						$path = str_replace(array('S:MyLanguage/','Special:MyLanguage/'), '', $path);
 						$html .= $this->accordion_item($path, $child->nodeValue);
 					}
 				}
