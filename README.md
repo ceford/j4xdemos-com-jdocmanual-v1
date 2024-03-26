@@ -1,5 +1,7 @@
 # JDOC Manual
 
+This version is obsolete and was archive on 2024-0326.
+
 This component can display pages from a Mediawiki server with 
 the aid of an index document. For example, you may wish to switch 
 from Joomla 4 documents to Joomla 3 documents and to see 
